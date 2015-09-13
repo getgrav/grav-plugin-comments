@@ -1,0 +1,58 @@
+{% extends 'partials/base.html.twig' %}
+{% set mode = 'types' %}
+
+{% if uri.paths[1] == 'data-manager' and uri.paths[2] %}
+    {% set mode = 'items' %}
+    {% set type = uri.paths[2] %}
+
+    {% if uri.paths[3] %}
+        {% set mode = 'item' %}
+        {% set item = uri.paths[3] %}
+    {% endif %}
+
+{% endif %}
+
+{% if admin.route %}
+    {% set context = admin.page(true) %}
+{% endif %}
+
+{% block titlebar %}
+    {% if mode == 'types' %}
+        <div class="button-bar">
+            <a class="button" href="{{ base_url }}"><i class="fa fa-reply"></i> {{ "PLUGIN_ADMIN.BACK"|tu }}</a>
+        </div>
+        <h1><i class="fa fa-fw fa-file-text-o"></i> {{ "PLUGIN_DATA_MANAGER.DATA_TYPES"|tu }}</h1>
+    {% elseif mode == 'items' %}
+        <div class="button-bar">
+            <a class="button" href="{{ base_url }}/data-manager"><i class="fa fa-reply"></i> {{ "PLUGIN_ADMIN.BACK"|tu }}</a>
+        </div>
+        <h1><i class="fa fa-fw fa-file-text-o"></i> {{ "PLUGIN_DATA_MANAGER.ITEMS_LIST"|tu }}</h1>
+    {% elseif mode == 'item' %}
+        <div class="button-bar">
+            <a class="button" href="{{ base_url }}/data-manager/{{ type }}"><i class="fa fa-reply"></i> {{ "PLUGIN_ADMIN.BACK"|tu }}</a>
+        </div>
+        <h1><i class="fa fa-fw fa-file-text-o"></i> {{ "PLUGIN_DATA_MANAGER.ITEM_DETAILS"|tu }}</h1>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <style>
+    .page-data ul { padding-left: 60px; display: block; list-style-type: square; }
+    .page-data ul li .row { padding-left: 0px }
+    </style>
+
+    <div class="page-data">
+        {% if mode == 'types' %}
+            {% include "partials/types.html.twig" %}
+        {% endif %}
+
+        {% if mode == 'items' %}
+            {% include ['partials/data-manager/' ~ type ~ '/items.html.twig', 'partials/items.html.twig'] %}
+        {% endif %}
+
+        {% if mode == 'item' %}
+            {% include ['partials/data-manager/' ~ type ~ '/item.html.twig', 'partials/item.html.twig'] %}
+        {% endif %}
+    </div>
+{% endblock %}

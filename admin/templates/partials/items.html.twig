@@ -1,0 +1,47 @@
+<h1>
+    {{ config.plugins['data-manager'].types[type].list.title ?: type|e|capitalize ~ " " ~ "PLUGIN_DATA_MANAGER.ITEMS_LIST"|e|tu }}
+</h1>
+<div class="row">
+    {% if config.plugins['data-manager'].types[type].list.columns %}
+        <table>
+            <thead>
+                <tr>
+                    {% for column in config.plugins['data-manager'].types[type].list.columns %}
+                        <th>{{ column.label|e }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in grav.twig.items %}
+                    <tr>
+                        {% for column in config.plugins['data-manager'].types[type].list.columns %}
+                            <td>
+                                <a href="{{ type }}/{{ item.route }}">
+                                    {% if column.field is iterable %}
+                                        {% set value = item.content %}
+                                        {% for field in column.field %}
+                                            {% set value = value[field] %}
+                                        {% endfor %}
+                                        {{ value|e }}
+                                    {% else %}
+                                        {{ item.content[column.field]|e }}
+                                    {% endif %}
+                                </a>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <ul class="pages-list depth-0">
+           {% for item in grav.twig.items %}
+               <li class="page-item">
+                   <div class="row">
+                       <a href="{{ type }}/{{ item.route }}" class="page-edit">{{ item.route|e }}</a>
+                   </div>
+               </li>
+           {% endfor %}
+        </ul>
+    {% endif %}
+</div>
