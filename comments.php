@@ -35,6 +35,13 @@ class CommentsPlugin extends Plugin
             'onAdminTemplateNavPluginHook' => ['onAdminTemplateNavPluginHook', 0],
             'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
         ]);
+
+        $comments[] = [
+            'route' => 'comment-test-1',
+            'content' => 'A comment text'
+        ];
+
+        $this->grav['twig']->comments = $comments;
     }
 
     /**
