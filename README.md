@@ -1,4 +1,4 @@
-# Grav Data Manager Plugin
+# Grav Comments Plugin
 
 The **Comments Plugin** for [Grav](http://github.com/getgrav/grav) adds the ability to add comments to pages, and moderate them.
 
@@ -6,7 +6,7 @@ The **Comments Plugin** for [Grav](http://github.com/getgrav/grav) adds the abil
 
 # Installation
 
-The Data plugin is easy to install with GPM.
+The Comments plugin is easy to install with GPM.
 
 ```
 $ bin/gpm install comments
@@ -16,10 +16,10 @@ Or clone from GitHub and put in the `user/plugins/comments` folder.
 
 # TODO
 
-- Create inferface (with Form?) to allow people to submit a comment to a Page
-- Store and email the comment to the emails configured (default to all with admin.super)
-- Enable by default on all Pages
+- Validate comment, name and email on the frontend form
+- Add language file for the frontend
+- Allow to moderate comments from the admin
+- Email the comment to the site admins (default to all with admin.super, could be configured)
 - Allow to enable on some taxonomies or page types only
 - Allow some pages to disable comments
-- Admin interface to moderate comments
-- Add ACL permissions so users can moderate comments in admin
+- Better presentation of the comments in Antimatter and other default themes

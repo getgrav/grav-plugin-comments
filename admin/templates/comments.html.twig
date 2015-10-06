@@ -9,28 +9,33 @@
 {% endblock %}
 
 {% block content %}
-
-    <style>
-    .page-data ul { padding-left: 60px; display: block; list-style-type: square; }
-    .page-data ul li .row { padding-left: 0px }
-    </style>
-
     <div class="page-data">
         <div class="gpm gpm-themes">
             <h1>
                 {{"PLUGIN_COMMENTS.COMMENTS"|e|tu}}
             </h1>
-            <div class="gpm gpm-themes themes card-row grid fixed-blocks pure-g">
-                <ul class="pages-list depth-0">
-                   {% for item in grav.twig.comments %}
-                       <li class="page-item">
-                           <div class="row">
-                               <a href="{{ item.route }}" class="page-edit">{{ item.content|e }}</a>
-                           </div>
-                       </li>
-                   {% endfor %}
-                </ul>
-            </div>
+
+            <table>
+                {% for file in grav.twig.files %}
+                    <tr data-gpm-plugin="#">
+                        <td class="gpm-name">
+                            <!-- <i class="fa fa-fw fa-{{ plugin.icon }}"></i> -->
+                            {{ file.fileName }}
+                            {% if file.data.hasUnread %}<span class="gpm-version">Has {{file.data.unreadCount}} unread comments</span>{% endif %}
+                        </td>
+                        <td class="gpm-actions">
+                            <span class="gpm-details-expand"><i class="fa fa-chevron-down"></i></span>
+                        </td>
+                        <td class="gpm-details">
+                            <div class="table-wrapper">
+                                {% include 'partials/comments-list.html.twig' with { file: file } %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
 {% endblock %}
+
+

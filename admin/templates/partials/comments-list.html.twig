@@ -1,0 +1,11 @@
+<table>
+    {% for comment in file.data.comments %}
+    <tr>
+        <td>
+            {{ comment.text }}
+            <br />
+            By {{ comment.author }} {{ comment.email }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

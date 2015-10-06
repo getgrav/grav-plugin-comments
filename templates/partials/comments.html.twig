@@ -1,0 +1,48 @@
+<h3>Add a Comment</h3>
+
+<script>
+jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
+    event.preventDefault();
+    jQuery.ajax({
+        url: "{{ grav.uri.rootUrl }}/add-comment",
+        data: {
+            text: $('.js__new-comment-text').val(),
+            name: $('.js__new-comment-name').val(),
+            email: $('.js__new-comment-email').val(),
+            path: "{{ grav.uri.path }}"
+        },
+        type: 'POST'
+    })
+    .success(function() {
+        window.location.reload();
+    })
+    .error(function() {
+
+    });
+});
+</script>
+
+<form>
+    <textarea class="js__new-comment-text"></textarea>
+
+    Name: <input type="text" class="js__new-comment-name" />
+    <br>
+    Email: <input type="text" class="js__new-comment-email" />
+
+    <br>
+    <input type="submit" class="js__add-new-comment" />
+</form>
+
+<h3>Comments</h3>
+
+<table>
+    {% for comment in grav.twig.comments|array_reverse %}
+    <tr>
+        <td>
+            {{ comment.text }}
+            <br />
+            Written on {{comment.date}} by {{comment.author}}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

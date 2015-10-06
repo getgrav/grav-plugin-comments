@@ -1,7 +1,7 @@
 ---
-title: Data Manager
+title: Comments
 
 access:
-    admin.data-manager: true
+    admin.comments: true
     admin.super: true
 ---
