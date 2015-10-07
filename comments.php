@@ -68,7 +68,6 @@ class CommentsPlugin extends Plugin
         $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
         $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 
-
         $filename = DATA_DIR . 'comments';
         $filename .= ($lang ? '/' . $lang : '');
         $filename .= $path . '.yaml';
@@ -86,6 +85,7 @@ class CommentsPlugin extends Plugin
         } else {
             $data = array(
                 'title' => $title,
+                'lang' => $lang,
                 'comments' => array([
                     'text' => $text,
                     'date' => gmdate('D, d M Y H:i:s', time()),
@@ -102,6 +102,7 @@ class CommentsPlugin extends Plugin
 
     private function getFilesOrderedByModifiedDate($path = '') {
         $files = [];
+
         $dirItr     = new \RecursiveDirectoryIterator(DATA_DIR . 'comments' . $path, \RecursiveDirectoryIterator::SKIP_DOTS);
         $filterItr  = new RecursiveFolderFilterIterator($dirItr);
         $itr        = new \RecursiveIteratorIterator($filterItr, \RecursiveIteratorIterator::SELF_FIRST);

@@ -56,7 +56,7 @@
                         <span data-toggle="children" data-hint="Something" class="hint--bottom js__comments-list-toggle">
                             <i class="page-icon fa fa-fw fa-circle-o children-closed"></i>
                         </span>
-                        <a href="#" class="page-edit">{{ file.data.title ?: file.fileName }}</a>
+                        <a href="#" class="page-edit">{{ file.data.title ?: file.fileName }}</a> <span class="badge lang info">{{file.data.lang}}</span>
                        <!--  <span class="page-home"><i class="fa fa-home"></i></span> -->
                         <p class="page-route">{% if file.data.hasUnread %}<span class="gpm-version">Has {{file.data.unreadCount}} unread comments</span>{% else %}<span class="gpm-version">{{file.data.comments|length}} comments</span>{% endif %}</p>
 
