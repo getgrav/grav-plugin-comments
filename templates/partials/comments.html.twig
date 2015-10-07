@@ -17,18 +17,21 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
     var captcha = $('#g-recaptcha-response').val();
 
     if (text.length == 0 || email.length == 0 || name.length == 0) {
-        alert('Please fill all the fields');
+        $('.alert').html('Please fill all the fields');
+        $('.alert-container').show();
         return;
     }
 
     if (!validateEmail(email)) {
-        alert('Please enter a valid email');
+        $('.alert').html('Please enter a valid email');
+        $('.alert-container').show();
         return;
     }
 
     {% if use_captcha %}
     if (!captcha) {
-        alert("Error validating the security code");
+        $('.alert').html("Error validating the security code");
+        $('.alert-container').show();
         return;
     }
     {% endif %}
@@ -47,10 +50,12 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
         type: 'POST'
     })
     .success(function() {
+        $('.alert-container').hide();
         window.location.reload();
     })
     .error(function() {
-        alert("Error while posting the comment");
+        $('.alert').html("Error while posting the comment");
+        $('.alert-container').show();
     });
 });
 </script>
@@ -75,6 +80,18 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
         };
     </script>
 {% endif %}
+
+<div class="alert-container" style="display: none">
+    <blockquote>
+        <blockquote>
+            <blockquote>
+                <blockquote>
+                    <p class="alert"></p>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </blockquote>
+</div>
 
 <form>
     <textarea class="js__new-comment-text"></textarea>
