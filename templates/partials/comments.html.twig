@@ -3,59 +3,61 @@
 <h3>Add a Comment</h3>
 
 <script>
-function validateEmail(email) {
-    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return re.test(email);
-}
-
-jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
-    event.preventDefault();
-
-    var text = $('.js__new-comment-text').val();
-    var name = $('.js__new-comment-name').val();
-    var email = $('.js__new-comment-email').val();
-    var captcha = $('#g-recaptcha-response').val();
-
-    if (text.length == 0 || email.length == 0 || name.length == 0) {
-        $('.alert').html('Please fill all the fields');
-        $('.alert-container').show();
-        return;
+$(function() {
+    function validateEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
     }
 
-    if (!validateEmail(email)) {
-        $('.alert').html('Please enter a valid email');
-        $('.alert-container').show();
-        return;
-    }
+    $(document).on('click tap', '.js__add-new-comment', function(event) {
+        event.preventDefault();
 
-    {% if use_captcha %}
-    if (!captcha) {
-        $('.alert').html("Error validating the security code");
-        $('.alert-container').show();
-        return;
-    }
-    {% endif %}
+        var text = $('.js__new-comment-text').val();
+        var name = $('.js__new-comment-name').val();
+        var email = $('.js__new-comment-email').val();
+        var captcha = $('#g-recaptcha-response').val();
 
-    jQuery.ajax({
-        url: "{{ grav.uri.rootUrl }}/add-comment",
-        data: {
-            text: $('.js__new-comment-text').val(),
-            name: $('.js__new-comment-name').val(),
-            email: $('.js__new-comment-email').val(),
-            title: "{{ grav.page.header.title }}",
-            lang: "{{ grav.language.getActive }}",
-            path: "{{ grav.uri.path }}",
-            {% if use_captcha %}recaptchaResponse: captcha{% endif %}
-        },
-        type: 'POST'
-    })
-    .success(function() {
-        $('.alert-container').hide();
-        window.location.reload();
-    })
-    .error(function() {
-        $('.alert').html("Error while posting the comment");
-        $('.alert-container').show();
+        if (text.length == 0 || email.length == 0 || name.length == 0) {
+            $('.alert').html('Please fill all the fields');
+            $('.alert-container').show();
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            $('.alert').html('Please enter a valid email');
+            $('.alert-container').show();
+            return;
+        }
+
+        {% if use_captcha %}
+        if (!captcha) {
+            $('.alert').html("Error validating the security code");
+            $('.alert-container').show();
+            return;
+        }
+        {% endif %}
+
+        $.ajax({
+            url: "{{ grav.uri.rootUrl }}/add-comment",
+            data: {
+                text: $('.js__new-comment-text').val(),
+                name: $('.js__new-comment-name').val(),
+                email: $('.js__new-comment-email').val(),
+                title: "{{ grav.page.header.title }}",
+                lang: "{{ grav.language.getActive }}",
+                path: "{{ grav.uri.path }}",
+                {% if use_captcha %}recaptchaResponse: captcha{% endif %}
+            },
+            type: 'POST'
+        })
+        .success(function() {
+            $('.alert-container').hide();
+            window.location.reload();
+        })
+        .error(function() {
+            $('.alert').html("Error while posting the comment");
+            $('.alert-container').show();
+        });
     });
 });
 </script>
@@ -64,20 +66,22 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
     <script src="https://www.google.com/recaptcha/api.js?onload=captchaOnloadCallback&render=explicit" async defer></script>
 
     <script>
-        var captchaOnloadCallback = function captchaOnloadCallback() {
-            grecaptcha.render('g-recaptcha', {
-                'sitekey': "{{grav.config.plugins.comments.recatpcha_site_key}}",
-                'callback': captchaValidatedCallback,
-                'expired-callback': captchaExpiredCallback
-            });
-        }
+        $(function() {
+            var captchaOnloadCallback = function captchaOnloadCallback() {
+                grecaptcha.render('g-recaptcha', {
+                    'sitekey': "{{grav.config.plugins.comments.recatpcha_site_key}}",
+                    'callback': captchaValidatedCallback,
+                    'expired-callback': captchaExpiredCallback
+                });
+            }
 
-        var captchaValidatedCallback = function captchaValidatedCallback() {
-        };
+            var captchaValidatedCallback = function captchaValidatedCallback() {
+            };
 
-        var captchaExpiredCallback = function captchaExpiredCallback() {
-            grecaptcha.reset();
-        };
+            var captchaExpiredCallback = function captchaExpiredCallback() {
+                grecaptcha.reset();
+            };
+        });
     </script>
 {% endif %}
 
