@@ -127,21 +127,11 @@ class CommentsPlugin extends Plugin
         return $files;
     }
 
-
-
+    /**
+     * Return the comments associated to the current route
+     */
     private function fetchComments() {
-
-
         return $this->getFileContentFromRoute($this->grav['uri']->path() . '.yaml')['comments'];
-
-
-
-
-
-        // return [
-        //     'route' => 'comment-test-1',
-        //     'content' => 'A comment text'
-        // ];
     }
 
     /**
@@ -159,14 +149,6 @@ class CommentsPlugin extends Plugin
 
         return Yaml::parse($fileInstance->content());
     }
-
-    // /**
-    //  */
-    // public function onPageProcessed(Event $e)
-    // {
-    //     $page = $e['page'];
-    //     $page->setRawContent('ss');
-    // }
 
     /**
      * Add templates directory to twig lookup paths.
