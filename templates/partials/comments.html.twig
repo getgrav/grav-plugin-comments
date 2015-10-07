@@ -9,6 +9,7 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
             text: $('.js__new-comment-text').val(),
             name: $('.js__new-comment-name').val(),
             email: $('.js__new-comment-email').val(),
+            name: "{{ grav.page.header.title }}"
             path: "{{ grav.uri.path }}"
         },
         type: 'POST'

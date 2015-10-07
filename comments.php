@@ -80,6 +80,7 @@ class CommentsPlugin extends Plugin
             ];
         } else {
             $data = array(
+                'name' => $post['name'],
                 'comments' => array([
                     'text' => $post['text'],
                     'date' => gmdate('D, d M Y H:i:s', time()),
