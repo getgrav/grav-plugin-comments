@@ -1,3 +1,5 @@
+{% set use_captcha = grav.config.plugins.comments.use_captcha %}
+
 <h3>Add a Comment</h3>
 
 <script>
@@ -12,6 +14,7 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
     var text = $('.js__new-comment-text').val();
     var name = $('.js__new-comment-name').val();
     var email = $('.js__new-comment-email').val();
+    var captcha = $('#g-recaptcha-response').val();
 
     if (text.length == 0 || email.length == 0 || name.length == 0) {
         alert('Please fill all the fields');
@@ -23,6 +26,13 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
         return;
     }
 
+    {% if use_captcha %}
+    if (!captcha) {
+        alert("Error validating the security code");
+        return;
+    }
+    {% endif %}
+
     jQuery.ajax({
         url: "{{ grav.uri.rootUrl }}/add-comment",
         data: {
@@ -31,7 +41,8 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
             email: $('.js__new-comment-email').val(),
             title: "{{ grav.page.header.title }}",
             lang: "{{ grav.language.getActive }}",
-            path: "{{ grav.uri.path }}"
+            path: "{{ grav.uri.path }}",
+            {% if use_captcha %}recaptchaResponse: captcha{% endif %}
         },
         type: 'POST'
     })
@@ -39,15 +50,39 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
         window.location.reload();
     })
     .error(function() {
-
+        alert("Error while posting the comment");
     });
 });
 </script>
+
+{% if use_captcha %}
+    <script src="https://www.google.com/recaptcha/api.js?onload=captchaOnloadCallback&render=explicit" async defer></script>
+
+    <script>
+        var captchaOnloadCallback = function captchaOnloadCallback() {
+            grecaptcha.render('g-recaptcha', {
+                'sitekey': "{{grav.config.plugins.comments.recatpcha_site_key}}",
+                'callback': captchaValidatedCallback,
+                'expired-callback': captchaExpiredCallback
+            });
+        }
+
+        var captchaValidatedCallback = function captchaValidatedCallback() {
+        };
+
+        var captchaExpiredCallback = function captchaExpiredCallback() {
+            grecaptcha.reset();
+        };
+    </script>
+{% endif %}
 
 <form>
     <textarea class="js__new-comment-text"></textarea>
     Name: <input type="text" class="js__new-comment-name" />
     Email: <input type="email" class="js__new-comment-email" />
+    {% if use_captcha %}
+        <div class="g-recaptcha" id="g-recaptcha"></div>
+    {% endif %}
 
     <input type="submit" class="js__add-new-comment" />
 </form>

@@ -68,6 +68,21 @@ class CommentsPlugin extends Plugin
         $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
         $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 
+
+        if ($this->config->get('plugins.comments.use_captcha')) {
+            //Validate the captcha
+            $recaptchaResponse = filter_var(urldecode($post['recaptchaResponse']), FILTER_SANITIZE_STRING);
+
+            $url = 'https://www.google.com/recaptcha/api/siteverify?secret=';
+            $url .= $this->config->get('plugins.comments.recatpcha_secret');
+            $url .= '&response=' . $recaptchaResponse;
+            $response = json_decode(file_get_contents($url), true);
+
+            if ($response['success'] == false) {
+                throw new \RuntimeException('Error validating the Captcha');
+            }
+        }
+
         $filename = DATA_DIR . 'comments';
         $filename .= ($lang ? '/' . $lang : '');
         $filename .= $path . '.yaml';
