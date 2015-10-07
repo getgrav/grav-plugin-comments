@@ -9,33 +9,80 @@
 {% endblock %}
 
 {% block content %}
-    <div class="page-data">
-        <div class="gpm gpm-themes">
-            <h1>
-                {{"PLUGIN_COMMENTS.COMMENTS"|e|tu}}
-            </h1>
+    <style>
+        td.comments-actions {
+            flex: 0.1;
+        }
 
-            <table>
+        .pages-list .row {
+            padding-right: 1rem;
+        }
+
+        .comment-text {
+            line-height: 1.5rem;
+            display: inline-block;
+        }
+
+        .pages-list .row p.page-route {
+            margin: 0px 0 10px 0px;
+        }
+    </style>
+
+    <script>
+        jQuery(document).on('click tap', '.js__comments-list-toggle', function(event) {
+            $(this).find('.page-icon').toggleClass('children-open').toggleClass('children-closed');
+            $(this).closest('.row').find('.js__comments-list').toggle();
+        });
+    </script>
+
+    <div class="admin-block default-box-shadow">
+
+        <!-- <form id="page-filtering">
+            <div class="page-filters">
+                <input type="text" data-template-types="{&quot;blog&quot;:&quot;Blog&quot;,&quot;default&quot;:&quot;Default&quot;,&quot;error&quot;:&quot;Error&quot;,&quot;form&quot;:&quot;Form&quot;,&quot;formdata&quot;:&quot;Formdata&quot;,&quot;item&quot;:&quot;Item&quot;,&quot;modular&quot;:&quot;Modular&quot;,&quot;shoppingcart&quot;:&quot;Shoppingcart&quot;,&quot;shoppingcart_category&quot;:&quot;Shoppingcart category&quot;,&quot;shoppingcart_checkout&quot;:&quot;Shoppingcart checkout&quot;,&quot;shoppingcart_detail&quot;:&quot;Shoppingcart detail&quot;,&quot;shoppingcart_order&quot;:&quot;Shoppingcart order&quot;,&quot;shoppingcart_section&quot;:&quot;Shoppingcart section&quot;,&quot;simplesearch_results&quot;:&quot;Simplesearch results&quot;,&quot;snipcart&quot;:&quot;Snipcart&quot;,&quot;modular\/features&quot;:&quot;Features&quot;,&quot;modular\/showcase&quot;:&quot;Showcase&quot;,&quot;modular\/text&quot;:&quot;Text&quot;}" placeholder="Add Filters" class="page-filter selectized" name="page-filter" tabindex="-1" value="" style="display: none;"><div class="selectize-control page-filter multi plugin-optgroup_columns"><div class="selectize-input items not-full has-options"><input type="text" autocomplete="off" tabindex="" placeholder="Add Filters" style="width: 81px;"></div><div class="selectize-dropdown multi page-filter plugin-optgroup_columns" style="display: none;"><div class="selectize-dropdown-content"></div></div></div>
+            </div>
+            <div class="page-search">
+                <input type="text" placeholder="Search Pages" name="page-search">
+            </div>
+            <div class="page-shortcuts">
+                <span class="button button-x-small" data-page-toggleall="expand"><i class="fa fa-fw fa-plus-circle"></i> Expand All</span>
+                <span class="button button-x-small" data-page-toggleall="collapse"><i class="fa fa-fw fa-minus-circle"></i> Collapse All</span>
+            </div>
+        </form> -->
+        <ul class="pages-list depth-0">
+            <li class="page-item" data-nav-id="/blog">
                 {% for file in grav.twig.files %}
-                    <tr data-gpm-plugin="#">
-                        <td class="gpm-name">
-                            <!-- <i class="fa fa-fw fa-{{ plugin.icon }}"></i> -->
-                            {{ file.fileName }}
-                            {% if file.data.hasUnread %}<span class="gpm-version">Has {{file.data.unreadCount}} unread comments</span>{% endif %}
-                        </td>
-                        <td class="gpm-actions">
-                            <span class="gpm-details-expand"><i class="fa fa-chevron-down"></i></span>
-                        </td>
-                        <td class="gpm-details">
-                            <div class="table-wrapper">
-                                {% include 'partials/comments-list.html.twig' with { file: file } %}
-                            </div>
-                        </td>
-                    </tr>
+                    <div class="row">
+                        <span data-toggle="children" data-hint="Something" class="hint--bottom js__comments-list-toggle">
+                            <i class="page-icon fa fa-fw fa-circle-o children-closed"></i>
+                        </span>
+                        <a href="#" class="page-edit">{{ file.data.name ?: file.fileName }}</a>
+                       <!--  <span class="page-home"><i class="fa fa-home"></i></span> -->
+                        <p class="page-route">{% if file.data.hasUnread %}<span class="gpm-version">Has {{file.data.unreadCount}} unread comments</span>{% else %}<span class="gpm-version">{{file.data.comments|length}} comments</span>{% endif %}</p>
+
+                        <ul class="js__comments-list" style="display: none;">
+                            {% for comment in file.data.comments|array_reverse %}
+                                <li class="page-item" data-nav-id="/blog/classic-modern-architecture">
+                                    <div class="row">
+                                        <a href="#" class="page-edit comment-text">{{comment.text}}</a>
+
+                                        <span class="page-home"></span>
+                                        <span class="page-tools">
+                                            <a href="#delete" class="page-delete"><i class="fa fa-close"></i></a>
+                                        </span>
+                                        <p class="page-route">{{comment.author}} <span class="spacer"><i class="fa fa-long-arrow-right"></i></span> {{comment.date}}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
                 {% endfor %}
-            </table>
-        </div>
+            </li>
+        </ul>
     </div>
+
 {% endblock %}
 
 
