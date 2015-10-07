@@ -16,7 +16,6 @@ Or clone from GitHub and put in the `user/plugins/comments` folder.
 
 # TODO
 
-- Validate comment, name and email on the frontend form
 - Add language file for the frontend
 - Allow to moderate comments from the admin
 - Email the comment to the site admins (default to all with admin.super, could be configured)

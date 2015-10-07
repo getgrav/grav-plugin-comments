@@ -53,7 +53,15 @@ class CommentsPlugin extends Plugin
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
-            $this->grav['twig']->files = $this->getFilesOrderedByModifiedDate();
+            $page = $this->grav['uri']->param('page');
+            $comments = $this->getLastComments($page);
+
+            if ($page > 0) {
+                echo json_encode($comments);
+                exit();
+            }
+
+            $this->grav['twig']->comments = $comments;
         }
     }
 
@@ -150,6 +158,48 @@ class CommentsPlugin extends Plugin
         });
 
         return $files;
+    }
+
+    private function getLastComments($page = 0) {
+        $number = 10;
+
+        $files = [];
+        $files = $this->getFilesOrderedByModifiedDate();
+
+        $comments = [];
+
+        foreach($files as $file) {
+            $data = Yaml::parse(file_get_contents($file->filePath));
+            for($i = 0; $i < count($data['comments']); $i++) {
+                $data['comments'][$i]['pageTitle'] = $data['title'];
+                $data['comments'][$i]['filePath'] = $file->filePath;
+
+            }
+            $comments = array_merge($comments, $data['comments']);
+        }
+
+        // Order comments by date
+        usort($comments, function($a, $b) {
+            return !($a['date'] > $b['date']);
+        });
+
+        $totalAvailable = count($comments);
+
+        $comments = array_slice($comments, $page * $number, $number);
+
+        $totalRetrieved = ($page + 1) * $number;
+        $hasMore = false;
+
+        if ($totalAvailable > $totalRetrieved) {
+            $hasMore = true;
+        }
+
+        return (object)array(
+            "comments" => $comments,
+            "page" => $page,
+            "totalAvailable" => $totalAvailable,
+            "totalRetrieved" => $totalRetrieved
+        );
     }
 
     /**
