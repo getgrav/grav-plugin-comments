@@ -103,7 +103,11 @@ class CommentsPlugin extends Plugin
     private function getFilesOrderedByModifiedDate($path = '') {
         $files = [];
 
-        $dirItr     = new \RecursiveDirectoryIterator(DATA_DIR . 'comments' . $path, \RecursiveDirectoryIterator::SKIP_DOTS);
+        if (!$path) {
+            $path = DATA_DIR . 'comments';
+        }
+
+        $dirItr     = new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
         $filterItr  = new RecursiveFolderFilterIterator($dirItr);
         $itr        = new \RecursiveIteratorIterator($filterItr, \RecursiveIteratorIterator::SELF_FIRST);
 
@@ -121,7 +125,7 @@ class CommentsPlugin extends Plugin
 
         foreach ($itr as $file) {
             if ($file->isDir()) {
-                $this->getFilesOrderedByModifiedDate('/' . $file->getFilename());
+                $this->getFilesOrderedByModifiedDate($file->getPath() . '/' . $file->getFilename());
             }
         }
 
