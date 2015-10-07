@@ -31,12 +31,6 @@ class CommentsPlugin extends Plugin
     {
         if (!$this->isAdmin()) {
 
-            // //Site
-            // $this->enable([
-            //     'onPageProcessed' => ['onPageProcessed', 0],
-            // ]);
-
-
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
             ]);
@@ -66,26 +60,37 @@ class CommentsPlugin extends Plugin
     public function addComment()
     {
         $post = !empty($_POST) ? $_POST : [];
-        $filename = DATA_DIR . 'comments' . $post['path'] . '.yaml';
+
+        $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
+        $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
+        $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
+        $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
+        $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
+        $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+
+
+        $filename = DATA_DIR . 'comments';
+        $filename .= ($lang ? '/' . $lang : '');
+        $filename .= $path . '.yaml';
         $file = File::instance($filename);
 
         if (file_exists($filename)) {
             $data = Yaml::parse($file->content());
 
             $data['comments'][] = [
-                'text' => $post['text'],
+                'text' => $text,
                 'date' => gmdate('D, d M Y H:i:s', time()),
-                'author' => $post['name'],
-                'email' => $post['email']
+                'author' => $name,
+                'email' => $email
             ];
         } else {
             $data = array(
-                'name' => $post['name'],
+                'title' => $title,
                 'comments' => array([
-                    'text' => $post['text'],
+                    'text' => $text,
                     'date' => gmdate('D, d M Y H:i:s', time()),
-                    'author' => $post['name'],
-                    'email' => $post['email']
+                    'author' => $name,
+                    'email' => $email
                 ])
             );
         }
@@ -131,13 +136,17 @@ class CommentsPlugin extends Plugin
      * Return the comments associated to the current route
      */
     private function fetchComments() {
-        return $this->getFileContentFromRoute($this->grav['uri']->path() . '.yaml')['comments'];
+        $lang = $this->grav['language']->getActive();
+        $filename = $lang ? '/' . $lang : '';
+        $filename .= $this->grav['uri']->path() . '.yaml';
+
+        return $this->getDataFromFilename($filename)['comments'];
     }
 
     /**
      * Given a data file route, return the YAML content already parsed
      */
-    private function getFileContentFromRoute($fileRoute) {
+    private function getDataFromFilename($fileRoute) {
 
         //Single item details
         $fileInstance = File::instance(DATA_DIR . 'comments/' . $fileRoute);

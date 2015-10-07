@@ -1,15 +1,36 @@
 <h3>Add a Comment</h3>
 
 <script>
+function validateEmail(email) {
+    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return re.test(email);
+}
+
 jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
     event.preventDefault();
+
+    var text = $('.js__new-comment-text').val();
+    var name = $('.js__new-comment-name').val();
+    var email = $('.js__new-comment-email').val();
+
+    if (text.length == 0 || email.length == 0 || name.length == 0) {
+        alert('Please fill all the fields');
+        return;
+    }
+
+    if (!validateEmail(email)) {
+        alert('Please enter a valid email');
+        return;
+    }
+
     jQuery.ajax({
         url: "{{ grav.uri.rootUrl }}/add-comment",
         data: {
             text: $('.js__new-comment-text').val(),
             name: $('.js__new-comment-name').val(),
             email: $('.js__new-comment-email').val(),
-            name: "{{ grav.page.header.title }}"
+            title: "{{ grav.page.header.title }}",
+            lang: "{{ grav.language.getActive }}",
             path: "{{ grav.uri.path }}"
         },
         type: 'POST'
@@ -25,25 +46,25 @@ jQuery(document).on('click tap', '.js__add-new-comment', function(event) {
 
 <form>
     <textarea class="js__new-comment-text"></textarea>
-
     Name: <input type="text" class="js__new-comment-name" />
-    <br>
-    Email: <input type="text" class="js__new-comment-email" />
+    Email: <input type="email" class="js__new-comment-email" />
 
-    <br>
     <input type="submit" class="js__add-new-comment" />
 </form>
 
-<h3>Comments</h3>
+{% if grav.twig.comments|length %}
 
-<table>
-    {% for comment in grav.twig.comments|array_reverse %}
-    <tr>
-        <td>
-            {{ comment.text }}
-            <br />
-            Written on {{comment.date}} by {{comment.author}}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <h3>Comments</h3>
+
+    <table>
+        {% for comment in grav.twig.comments|array_reverse %}
+        <tr>
+            <td>
+                {{comment.text|e}}
+                <br />
+                Written on {{comment.date|e}} by {{comment.author|e}}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
