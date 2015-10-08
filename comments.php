@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class CommentsPlugin extends Plugin
 {
-    protected $route = 'comments';
+    protected $route = '/admin/comments';
 
     /**
      * @return array
@@ -46,12 +46,20 @@ class CommentsPlugin extends Plugin
             }
 
         } else {
+
+            /** @var Uri $uri */
+            $uri = $this->grav['uri'];
+
             //Admin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
                 'onAdminTemplateNavPluginHook' => ['onAdminTemplateNavPluginHook', 0],
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
+
+            if (strpos($uri->path(), $this->route) === false) {
+                return;
+            }
 
             $page = $this->grav['uri']->param('page');
             $comments = $this->getLastComments($page);
@@ -75,7 +83,6 @@ class CommentsPlugin extends Plugin
         $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
         $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
         $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
-
 
         if ($this->config->get('plugins.comments.use_captcha')) {
             //Validate the captcha
