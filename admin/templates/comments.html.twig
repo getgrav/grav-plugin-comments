@@ -59,8 +59,14 @@
                             '</tr>');
                     })
 
-                    $('.totalRetrieved').html(response.totalRetrieved);
+                    var totalRetrieved = response.totalRetrieved * (parseInt(response.page) + 1);
+
+                    $('.totalRetrieved').html(totalRetrieved);
                     $('.totalAvailable').html(response.totalAvailable);
+
+                    if (totalRetrieved == response.totalAvailable) {
+                        $('.js__load-more').hide();
+                    }
                 })
                 .error(function() {
                     alert('Unexpected error');
@@ -69,7 +75,7 @@
         });
     </script>
 
-    <h1>Latest comments</h1>
+    <h1>Comments from the last 7 days</h1>
 
     <div class="admin-block default-box-shadow">
         <table>

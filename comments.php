@@ -144,15 +144,24 @@ class CommentsPlugin extends Plugin
         $itrItr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::SELF_FIRST);
         $filesItr = new \RegexIterator($itrItr, '/^.+\.yaml$/i');
 
+        // Collect files if modified in the last 7 days
         foreach ($filesItr as $filepath => $file) {
+            $modifiedDate = $file->getMTime();
+            $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
+
+            if ($modifiedDate < $sevenDaysAgo) {
+                continue;
+            }
+
             $files[] = (object)array(
-                "modifiedDate" => $file->getMTime(),
+                "modifiedDate" => $modifiedDate,
                 "fileName" => $file->getFilename(),
                 "filePath" => $filepath,
                 "data" => Yaml::parse(file_get_contents($filepath))
             );
         }
 
+        // Traverse folders and recurse
         foreach ($itr as $file) {
             if ($file->isDir()) {
                 $this->getFilesOrderedByModifiedDate($file->getPath() . '/' . $file->getFilename());
@@ -168,7 +177,7 @@ class CommentsPlugin extends Plugin
     }
 
     private function getLastComments($page = 0) {
-        $number = 10;
+        $number = 30;
 
         $files = [];
         $files = $this->getFilesOrderedByModifiedDate();
@@ -177,12 +186,20 @@ class CommentsPlugin extends Plugin
 
         foreach($files as $file) {
             $data = Yaml::parse(file_get_contents($file->filePath));
-            for($i = 0; $i < count($data['comments']); $i++) {
+            for ($i = 0; $i < count($data['comments']); $i++) {
+                $commentDate = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
+                $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
+
+                if ($commentDate < $sevenDaysAgo) {
+                    continue;
+                }
+
                 $data['comments'][$i]['pageTitle'] = $data['title'];
                 $data['comments'][$i]['filePath'] = $file->filePath;
-
             }
-            $comments = array_merge($comments, $data['comments']);
+            if (count($data['comments'])) {
+                $comments = array_merge($comments, $data['comments']);
+            }
         }
 
         // Order comments by date
@@ -194,7 +211,7 @@ class CommentsPlugin extends Plugin
 
         $comments = array_slice($comments, $page * $number, $number);
 
-        $totalRetrieved = ($page + 1) * $number;
+        $totalRetrieved = count($comments);
         $hasMore = false;
 
         if ($totalAvailable > $totalRetrieved) {
