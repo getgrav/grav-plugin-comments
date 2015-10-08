@@ -14,11 +14,57 @@ $ bin/gpm install comments
 
 Or clone from GitHub and put in the `user/plugins/comments` folder.
 
-# TODO
+# Usage
 
-- Add language file for the frontend
-- Allow to moderate comments from the admin
+Add `{% include 'partials/comments.html.twig' with {'page': page} %}` to the template file where you want to add comments.
+
+For example, in Antimatter, in `templates/item.html.twig`:
+
+```twig
+{% embed 'partials/base.html.twig' %}
+
+    {% block content %}
+        {% if config.plugins.breadcrumbs.enabled %}
+            {% include 'partials/breadcrumbs.html.twig' %}
+        {% endif %}
+
+        <div class="blog-content-item grid pure-g-r">
+            <div id="item" class="block pure-u-2-3">
+                {% include 'partials/blog_item.html.twig' with {'blog':page.parent, 'truncate':false} %}
+            </div>
+            <div id="sidebar" class="block size-1-3 pure-u-1-3">
+                {% include 'partials/sidebar.html.twig' with {'blog':page.parent} %}
+            </div>
+        </div>
+
+        {% include 'partials/comments.html.twig' with {'page': page} %}
+    {% endblock %}
+
+{% endembed %}
+```
+
+The comment form will appear to the blog post items.
+
+# Enable the Captcha anti-spam filter
+
+To reduce spam in your comments, enable the Google Recaptcha integration we added. Copy the plugin's `comments.yaml` to `user/config/plugins/comments.yaml` and enable `use_captcha`. Also add the Google Recaptcha API keys to allow it to work correctly.
+
+# Where are the comments stored?
+
+In the `user/data/comments` folder. They're organized by page route, so every page with a comment has a corresponding file. This enabled a quick load of all the page comments.
+
+# Visualize comments
+
+When the plugin is installed and enabled, the `Comments` menu will appear in the Admin Plugin. From there you can see all the comments made in the last 7 days.
+
+Further improvements to the comments visualization will be added in the next releases.
+
+# Things still missing
+
+- Add language file
+- Allow to delete comments from the Admin Plugin
 - Email the comment to the site admins (default to all with admin.super, could be configured)
-- Allow to enable on some taxonomies or page types only
-- Allow some pages to disable comments
-- Better presentation of the comments in Antimatter and other default themes
+- Allow some pages to disable adding comments
+- Ability to see all comments of a page in the Admin Plugin
+- Ability to reply to a comment from the Admin Plugin
+- Auto-fill the comment form when a user is logged in
