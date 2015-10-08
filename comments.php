@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class CommentsPlugin extends Plugin
 {
-    protected $route = '/admin/comments';
+    protected $route = 'comments';
 
     /**
      * @return array
@@ -57,7 +57,7 @@ class CommentsPlugin extends Plugin
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
-            if (strpos($uri->path(), $this->route) === false) {
+            if (strpos($uri->path(), '/admin/' . $this->route) === false) {
                 return;
             }
 
