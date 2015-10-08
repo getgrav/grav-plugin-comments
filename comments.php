@@ -6,9 +6,10 @@ use Grav\Common\Grav;
 use Grav\Common\Page\Page;
 use Grav\Common\Page\Pages;
 use Grav\Common\Plugin;
+use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
+use Grav\Common\User\User;
 use RocketTheme\Toolbox\File\File;
 use RocketTheme\Toolbox\Event\Event;
-use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
 use Symfony\Component\Yaml\Yaml;
 
 class CommentsPlugin extends Plugin
@@ -127,7 +128,40 @@ class CommentsPlugin extends Plugin
 
         $file->save(Yaml::dump($data));
 
+        if (isset($this->grav['Email']) && $this->grav['config']->get('plugins.comments.enable_email_notifications')) {
+            $this->sendEmailNotification(array(
+                'title' => $title,
+                'comment' => array(
+                    'text' => $text,
+                    'date' => gmdate('D, d M Y H:i:s', time()),
+                    'author' => $name,
+                    'email' => $email
+                )
+            ));
+        }
+
         exit();
+    }
+
+    private function sendEmailNotification($comment) {
+        /** @var Language $l */
+        $l = $this->grav['language'];
+
+        $sitename = $this->grav['config']->get('site.title', 'Website');
+        $from = $this->grav['config']->get('plugins.email.from', 'noreply@getgrav.org');
+        $to = $this->grav['config']->get('plugins.email.email');
+
+        $subject = $l->translate(['PLUGIN_COMMENTS.NEW_COMMENT_EMAIL_SUBJECT', $sitename]);
+        $content = $l->translate(['PLUGIN_COMMENTS.NEW_COMMENT_EMAIL_BODY', $sitename, $comment['title'], $comment['comment']['text'], $comment['comment']['author'], $comment['comment']['email']]);
+
+        $twig = $this->grav['twig'];
+        $body = $twig->processTemplate('email/base.html.twig', ['content' => $content]);
+
+        $message = $this->grav['Email']->message($subject, $body, 'text/html')
+            ->setFrom($from)
+            ->setTo($to);
+
+        $sent = $this->grav['Email']->send($message);
     }
 
     private function getFilesOrderedByModifiedDate($path = '') {

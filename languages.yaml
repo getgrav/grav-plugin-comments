@@ -1,3 +1,7 @@
 en:
   PLUGIN_COMMENTS:
     COMMENTS: Comments
+    EMAIL_NOT_CONFIGURED: Email not configured
+    NEW_COMMENT_EMAIL_SUBJECT: 'New comment on %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>A new comment was made on %1$s by %3$s (%4$s).</p><p>Post: %2$s</p><p>Text: %5$s</p>'
+    EMAIL_FOOTER: ''

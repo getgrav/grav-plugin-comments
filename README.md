@@ -59,11 +59,14 @@ When the plugin is installed and enabled, the `Comments` menu will appear in the
 
 Further improvements to the comments visualization will be added in the next releases.
 
+# Email notifications
+
+Upon receiving a comment, if `enable_email_notifications` is enabled, the Comments plugin will send an email to the `notifications_email_to` address set in the plugin options.
+
 # Things still missing
 
 - Add language file
 - Allow to delete comments from the Admin Plugin
-- Email the comment to the site admins (default to all with admin.super, could be configured)
 - Allow some pages to disable adding comments
 - Ability to see all comments of a page in the Admin Plugin
 - Ability to reply to a comment from the Admin Plugin
