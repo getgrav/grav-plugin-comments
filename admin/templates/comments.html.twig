@@ -75,9 +75,9 @@
         });
     </script>
 
-    <h1>Comments from the last 7 days</h1>
+    <h1>Comments in the last 7 days</h1>
 
-    <div class="admin-block default-box-shadow">
+    <div class="admin-block">
         <table>
             <tbody class="js__comments-container">
                 <tr class="h">
@@ -87,9 +87,9 @@
                 </tr>
                 {% for comment in grav.twig.comments.comments %}
                     <tr>
-                        <td class="e author">{{comment.author}}</td>
-                        <td class="v comment">{{comment.text}}</td>
-                        <td class="v details"><strong>Page</strong>: {{comment.pageTitle}}<br>
+                        <td class="author">{{comment.author}}</td>
+                        <td class="comment">{{comment.text}}</td>
+                        <td class="details"><strong>Page</strong>: {{comment.pageTitle}}<br>
                         <strong>Date</strong>: {{comment.date}}</td>
                     </tr>
                 {% endfor %}
