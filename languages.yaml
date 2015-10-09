@@ -3,5 +3,20 @@ en:
     COMMENTS: Comments
     EMAIL_NOT_CONFIGURED: Email not configured
     NEW_COMMENT_EMAIL_SUBJECT: 'New comment on %1$s'
-    NEW_COMMENT_EMAIL_BODY: '<p>A new comment was made on %1$s by %3$s (%4$s).</p><p>Post: %2$s</p><p>Text: %5$s</p>'
+    NEW_COMMENT_EMAIL_BODY: '<p>A new comment was made on %1$s by %3$s (%4$s).</p><p>Page: %2$s</p><p>Text: %5$s</p>'
     EMAIL_FOOTER: ''
+    NAME: Name:
+    EMAIL: Email:
+    WRITTEN_ON: Written on
+    BY: by
+it:
+  PLUGIN_COMMENTS:
+    COMMENTS: Commenti
+    EMAIL_NOT_CONFIGURED: Email non configurata
+    NEW_COMMENT_EMAIL_SUBJECT: 'Nuovo commento su %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Un nuovo commento è stato postato su %1$s da %3$s (%4$s).</p><p>Pagina: %2$s</p><p>Testo: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Nome:
+    EMAIL: Email:
+    WRITTEN_ON: Scritto il
+    BY: da

@@ -99,8 +99,8 @@ $(function() {
 
 <form>
     <textarea class="js__new-comment-text"></textarea>
-    Name: <input type="text" class="js__new-comment-name" />
-    Email: <input type="email" class="js__new-comment-email" />
+    {{'PLUGIN_COMMENTS.NAME'|t}} <input type="text" class="js__new-comment-name" />
+    {{'PLUGIN_COMMENTS.EMAIL'|t}} <input type="email" class="js__new-comment-email" />
     {% if use_captcha %}
         <div class="g-recaptcha" id="g-recaptcha"></div>
     {% endif %}
@@ -110,7 +110,7 @@ $(function() {
 
 {% if grav.twig.comments|length %}
 
-    <h3>Comments</h3>
+    <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
 
     <table>
         {% for comment in grav.twig.comments|array_reverse %}
@@ -118,7 +118,7 @@ $(function() {
             <td>
                 {{comment.text|e}}
                 <br />
-                Written on {{comment.date|e}} by {{comment.author|e}}
+                {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author|e}}
             </td>
         </tr>
         {% endfor %}
