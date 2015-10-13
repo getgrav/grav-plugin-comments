@@ -1,5 +1,6 @@
 en:
   PLUGIN_COMMENTS:
+    ADD_COMMENT: Add a comment
     COMMENTS: Comments
     EMAIL_NOT_CONFIGURED: Email not configured
     NEW_COMMENT_EMAIL_SUBJECT: 'New comment on %1$s'
@@ -11,6 +12,7 @@ en:
     BY: by
 it:
   PLUGIN_COMMENTS:
+    ADD_COMMENT: Aggiungi un commento
     COMMENTS: Commenti
     EMAIL_NOT_CONFIGURED: Email non configurata
     NEW_COMMENT_EMAIL_SUBJECT: 'Nuovo commento su %1$s'
