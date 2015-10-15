@@ -1,7 +1,7 @@
 <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
 
 <form name="{{ grav.config.plugins.comments.form.name }}"
-      action="{{ uri.rootUrl ~ (grav.config.plugins.comments.form.action|default(page.route)) }}/processform:true"
+      action="{{ uri.rootUrl ~ (grav.config.plugins.comments.form.action|default(page.route)) }}"
       method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
 {% for field in grav.config.plugins.comments.form.fields %}
 
