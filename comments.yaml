@@ -1,4 +1,13 @@
 enabled: true
+
+enable_on_routes:
+  - '/blog'
+
+disable_on_routes:
+  - /blog/blog-post-to-ignore
+  - /ignore-this-route
+  #- '/blog/daring-fireball-link'
+
 form:
     name: comments
     fields:
@@ -45,7 +54,7 @@ form:
         # - name: g-recaptcha-response
         #   label: Captcha
         #   type: captcha
-        #   recatpcha_site_key: 6Lde4gwTAAAAAAZuv4z2AgVU6Xamn5twDYzQr8hv
+        #   recatpcha_site_key: e32iojeoi32jeoi32jeoij32oiej32oiej3
         #   recaptcha_not_validated: 'Captcha not valid!'
         #   validate:
         #     required: true
@@ -61,7 +70,7 @@ form:
         #     subject: "[Site Guestbook] {{ form.value.name|e }}"
         #     body: "{% include 'forms/data.html.twig' %}"
         # - captcha:
-        #     recatpcha_secret: 6Lde4gwTAAAAAPpwVKuaYm53n2bWfFfxcDxSlI54
+        #     recatpcha_secret: ej32oiej23oiej32oijeoi32jeio32je
         - addComment:
         - message: Thank you for writing your comment!
 

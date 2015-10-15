@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 class CommentsPlugin extends Plugin
 {
     protected $route = 'comments';
+    protected $enable = false;
 
     /**
      * @return array
@@ -51,7 +52,43 @@ class CommentsPlugin extends Plugin
 
     public function onTwigSiteVariables() {
         if (!$this->isAdmin()) {
-            $this->grav['twig']->comments = $this->fetchComments();
+            $this->grav['twig']->enable = $this->enable;
+
+            if ($this->enable) {
+                $this->grav['twig']->comments = $this->fetchComments();
+            }
+        }
+    }
+
+    /**
+     * Determine if $haystack starts with $needle. Credit: http://stackoverflow.com/a/10473026/205039
+     */
+    private function startsWith($haystack, $needle) {
+        return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
+    }
+
+    /**
+     * Determine if the plugin should be enabled based on the enable_on_routes and disable_on_routes config options
+     */
+    private function calculateEnable() {
+        $uri = $this->grav['uri'];
+
+        $disable_on_routes = (array) $this->config->get('plugins.comments.disable_on_routes');
+        $enable_on_routes = (array) $this->config->get('plugins.comments.enable_on_routes');
+
+        $path = $uri->path();
+
+        if (!in_array($path, $disable_on_routes)) {
+            if (in_array($path, $enable_on_routes)) {
+                $this->enable = true;
+            } else {
+                foreach($enable_on_routes as $route) {
+                    if ($this->startsWith($path, $route)) {
+                        $this->enable = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -60,6 +97,8 @@ class CommentsPlugin extends Plugin
     public function onPluginsInitialized()
     {
         if (!$this->isAdmin()) {
+
+            $this->calculateEnable();
 
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
@@ -118,6 +157,7 @@ class CommentsPlugin extends Plugin
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
                 $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+
                 /** @var Language $language */
                 $language = $this->grav['language'];
                 $lang = $language->getLanguage();
