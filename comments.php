@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 class CommentsPlugin extends Plugin
 {
     protected $route = 'comments';
+    protected $enable = false;
 
     /**
      * @return array
@@ -23,7 +24,72 @@ class CommentsPlugin extends Plugin
     {
         return [
             'onPluginsInitialized' => ['onPluginsInitialized', 0],
+            'onFormProcessed' => ['onFormProcessed', 0],
+            'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
         ];
+    }
+
+    /**
+     * Initialize form if the page has one. Also catches form processing if user posts the form.
+     */
+    public function onPageInitialized()
+    {
+        if (!$this->isAdmin()) {
+            /** @var Page $page */
+            $page = $this->grav['page'];
+            if (!$page) {
+                return;
+            }
+
+            $header = $page->header();
+            if (!isset($header->form)) {
+                $header->form = $this->grav['config']->get('plugins.comments.form');
+                $page->header($header);
+            }
+        }
+    }
+
+    public function onTwigSiteVariables() {
+        if (!$this->isAdmin()) {
+            $this->grav['twig']->enable = $this->enable;
+
+            if ($this->enable) {
+                $this->grav['twig']->comments = $this->fetchComments();
+            }
+        }
+    }
+
+    /**
+     * Determine if $haystack starts with $needle. Credit: http://stackoverflow.com/a/10473026/205039
+     */
+    private function startsWith($haystack, $needle) {
+        return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
+    }
+
+    /**
+     * Determine if the plugin should be enabled based on the enable_on_routes and disable_on_routes config options
+     */
+    private function calculateEnable() {
+        $uri = $this->grav['uri'];
+
+        $disable_on_routes = (array) $this->config->get('plugins.comments.disable_on_routes');
+        $enable_on_routes = (array) $this->config->get('plugins.comments.enable_on_routes');
+
+        $path = $uri->path();
+
+        if (!in_array($path, $disable_on_routes)) {
+            if (in_array($path, $enable_on_routes)) {
+                $this->enable = true;
+            } else {
+                foreach($enable_on_routes as $route) {
+                    if ($this->startsWith($path, $route)) {
+                        $this->enable = true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -32,19 +98,11 @@ class CommentsPlugin extends Plugin
     {
         if (!$this->isAdmin()) {
 
+            $this->calculateEnable();
+
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
             ]);
-
-            $this->addCommentURL = $this->config->get('plugins.comments.addCommentURL', '/add-comment');
-
-            if ($this->addCommentURL && $this->addCommentURL == $this->grav['uri']->path()) {
-                $this->enable([
-                    'onPagesInitialized' => ['addComment', 0]
-                ]);
-            } else {
-                $this->grav['twig']->comments = $this->fetchComments();
-            }
 
         } else {
 
@@ -74,94 +132,66 @@ class CommentsPlugin extends Plugin
         }
     }
 
-    public function addComment()
+    /**
+     * Handle form processing instructions.
+     *
+     * @param Event $event
+     */
+    public function onFormProcessed(Event $event)
     {
-        $post = !empty($_POST) ? $_POST : [];
+        $form = $event['form'];
+        $action = $event['action'];
+        $params = $event['params'];
 
-        $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
-        $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
-        $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
-        $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
-        $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-        $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
-
-        if ($this->config->get('plugins.comments.use_captcha')) {
-            //Validate the captcha
-            $recaptchaResponse = filter_var(urldecode($post['recaptchaResponse']), FILTER_SANITIZE_STRING);
-
-            $url = 'https://www.google.com/recaptcha/api/siteverify?secret=';
-            $url .= $this->config->get('plugins.comments.recatpcha_secret');
-            $url .= '&response=' . $recaptchaResponse;
-            $response = json_decode(file_get_contents($url), true);
-
-            if ($response['success'] == false) {
-                throw new \RuntimeException('Error validating the Captcha');
-            }
+        if (!$this->active) {
+            return;
         }
 
-        $filename = DATA_DIR . 'comments';
-        $filename .= ($lang ? '/' . $lang : '');
-        $filename .= $path . '.yaml';
-        $file = File::instance($filename);
+        switch ($action) {
+            case 'addComment':
+                $post = !empty($_POST) ? $_POST : [];
 
-        if (file_exists($filename)) {
-            $data = Yaml::parse($file->content());
+                $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
+                $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
+                $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
+                $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
+                $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
+                $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 
-            $data['comments'][] = [
-                'text' => $text,
-                'date' => gmdate('D, d M Y H:i:s', time()),
-                'author' => $name,
-                'email' => $email
-            ];
-        } else {
-            $data = array(
-                'title' => $title,
-                'lang' => $lang,
-                'comments' => array([
-                    'text' => $text,
-                    'date' => gmdate('D, d M Y H:i:s', time()),
-                    'author' => $name,
-                    'email' => $email
-                ])
-            );
+                /** @var Language $language */
+                $language = $this->grav['language'];
+                $lang = $language->getLanguage();
+
+                $filename = DATA_DIR . 'comments';
+                $filename .= ($lang ? '/' . $lang : '');
+                $filename .= $path . '.yaml';
+                $file = File::instance($filename);
+
+                if (file_exists($filename)) {
+                    $data = Yaml::parse($file->content());
+
+                    $data['comments'][] = [
+                        'text' => $text,
+                        'date' => gmdate('D, d M Y H:i:s', time()),
+                        'author' => $name,
+                        'email' => $email
+                    ];
+                } else {
+                    $data = array(
+                        'title' => $title,
+                        'lang' => $lang,
+                        'comments' => array([
+                            'text' => $text,
+                            'date' => gmdate('D, d M Y H:i:s', time()),
+                            'author' => $name,
+                            'email' => $email
+                        ])
+                    );
+                }
+
+                $file->save(Yaml::dump($data));
+                break;
         }
-
-        $file->save(Yaml::dump($data));
-
-        if (isset($this->grav['Email']) && $this->grav['config']->get('plugins.comments.enable_email_notifications')) {
-            $this->sendEmailNotification(array(
-                'title' => $title,
-                'comment' => array(
-                    'text' => $text,
-                    'date' => gmdate('D, d M Y H:i:s', time()),
-                    'author' => $name,
-                    'email' => $email
-                )
-            ));
-        }
-
-        exit();
-    }
-
-    private function sendEmailNotification($comment) {
-        /** @var Language $l */
-        $l = $this->grav['language'];
-
-        $sitename = $this->grav['config']->get('site.title', 'Website');
-        $from = $this->grav['config']->get('plugins.email.from', 'noreply@getgrav.org');
-        $to = $this->grav['config']->get('plugins.email.email');
-
-        $subject = $l->translate(['PLUGIN_COMMENTS.NEW_COMMENT_EMAIL_SUBJECT', $sitename]);
-        $content = $l->translate(['PLUGIN_COMMENTS.NEW_COMMENT_EMAIL_BODY', $sitename, $comment['title'], $comment['comment']['text'], $comment['comment']['author'], $comment['comment']['email']]);
-
-        $twig = $this->grav['twig'];
-        $body = $twig->processTemplate('email/base.html.twig', ['content' => $content]);
-
-        $message = $this->grav['Email']->message($subject, $body, 'text/html')
-            ->setFrom($from)
-            ->setTo($to);
-
-        $sent = $this->grav['Email']->send($message);
     }
 
     private function getFilesOrderedByModifiedDate($path = '') {
@@ -242,15 +272,8 @@ class CommentsPlugin extends Plugin
         });
 
         $totalAvailable = count($comments);
-
         $comments = array_slice($comments, $page * $number, $number);
-
         $totalRetrieved = count($comments);
-        $hasMore = false;
-
-        if ($totalAvailable > $totalRetrieved) {
-            $hasMore = true;
-        }
 
         return (object)array(
             "comments" => $comments,
@@ -264,7 +287,7 @@ class CommentsPlugin extends Plugin
      * Return the comments associated to the current route
      */
     private function fetchComments() {
-        $lang = $this->grav['language']->getActive();
+        $lang = $this->grav['language']->getLanguage();
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
 

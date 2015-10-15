@@ -1,126 +1,44 @@
-{% set use_captcha = grav.config.plugins.comments.use_captcha %}
+{% if grav.twig.enable %}
 
-<h3>Add a Comment</h3>
+    <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
 
-<script>
-$(function() {
-    function validateEmail(email) {
-        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-        return re.test(email);
-    }
+    <form name="{{ grav.config.plugins.comments.form.name }}"
+          action="{{ uri.rootUrl ~ (grav.config.plugins.comments.form.action|default(page.route)) }}"
+          method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
+    {% for field in grav.config.plugins.comments.form.fields %}
 
-    $(document).on('click tap', '.js__add-new-comment', function(event) {
-        event.preventDefault();
-
-        var text = $('.js__new-comment-text').val();
-        var name = $('.js__new-comment-name').val();
-        var email = $('.js__new-comment-email').val();
-        var captcha = $('#g-recaptcha-response').val();
-
-        if (text.length == 0 || email.length == 0 || name.length == 0) {
-            $('.alert').html('Please fill all the fields');
-            $('.alert-container').show();
-            return;
-        }
-
-        if (!validateEmail(email)) {
-            $('.alert').html('Please enter a valid email');
-            $('.alert-container').show();
-            return;
-        }
-
-        {% if use_captcha %}
-        if (!captcha) {
-            $('.alert').html("Error validating the security code");
-            $('.alert-container').show();
-            return;
-        }
+        {% set value = form.value(field.name) %}
+        {% if field.evaluateDefault %}
+            {% set value = evaluate(field.evaluateDefault) %}
         {% endif %}
+        <div>
+            {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+        </div>
+    {% endfor %}
 
-        $.ajax({
-            url: "{{ grav.uri.rootUrl }}/add-comment",
-            data: {
-                text: $('.js__new-comment-text').val(),
-                name: $('.js__new-comment-name').val(),
-                email: $('.js__new-comment-email').val(),
-                title: "{{ grav.page.header.title }}",
-                lang: "{{ grav.language.getActive }}",
-                path: "{{ grav.uri.path }}",
-                {% if use_captcha %}recaptchaResponse: captcha{% endif %}
-            },
-            type: 'POST'
-        })
-        .success(function() {
-            $('.alert-container').hide();
-            window.location.reload();
-        })
-        .error(function() {
-            $('.alert').html("Error while posting the comment");
-            $('.alert-container').show();
-        });
-    });
-});
-</script>
-
-{% if use_captcha %}
-    <script src="https://www.google.com/recaptcha/api.js?onload=captchaOnloadCallback&render=explicit" async defer></script>
-
-    <script>
-        $(function() {
-            var captchaOnloadCallback = function captchaOnloadCallback() {
-                grecaptcha.render('g-recaptcha', {
-                    'sitekey': "{{grav.config.plugins.comments.recatpcha_site_key}}",
-                    'callback': captchaValidatedCallback,
-                    'expired-callback': captchaExpiredCallback
-                });
-            }
-
-            var captchaValidatedCallback = function captchaValidatedCallback() {
-            };
-
-            var captchaExpiredCallback = function captchaExpiredCallback() {
-                grecaptcha.reset();
-            };
-        });
-    </script>
-{% endif %}
-
-<div class="alert-container" style="display: none">
-    <blockquote>
-        <blockquote>
-            <blockquote>
-                <blockquote>
-                    <p class="alert"></p>
-                </blockquote>
-            </blockquote>
-        </blockquote>
-    </blockquote>
-</div>
-
-<form>
-    <textarea class="js__new-comment-text"></textarea>
-    {{'PLUGIN_COMMENTS.NAME'|t}} <input type="text" class="js__new-comment-name" />
-    {{'PLUGIN_COMMENTS.EMAIL'|t}} <input type="email" class="js__new-comment-email" />
-    {% if use_captcha %}
-        <div class="g-recaptcha" id="g-recaptcha"></div>
-    {% endif %}
-
-    <input type="submit" class="js__add-new-comment" />
-</form>
-
-{% if grav.twig.comments|length %}
-
-    <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
-
-    <table>
-        {% for comment in grav.twig.comments|array_reverse %}
-        <tr>
-            <td>
-                {{comment.text|e}}
-                <br />
-                {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author|e}}
-            </td>
-        </tr>
+        <div class="buttons">
+        {% for button in grav.config.plugins.comments.form.buttons %}
+            <button class="button" type="{{ button.type|default('submit') }}">{{ button.value|default('Submit') }}</button>
         {% endfor %}
-    </table>
+        </div>
+    </form>
+
+    <div class="alert">{{ form.message }}</div>
+
+    {% if grav.twig.comments|length %}
+
+        <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
+
+        <table>
+            {% for comment in grav.twig.comments|array_reverse %}
+            <tr>
+                <td>
+                    {{comment.text|e}}
+                    <br />
+                    {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author|e}}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endif %}

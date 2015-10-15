@@ -45,9 +45,9 @@ For example, in Antimatter, in `templates/item.html.twig`:
 
 The comment form will appear to the blog post items.
 
-# Enable the Captcha anti-spam filter
+# Enabling Recaptcha
 
-To reduce spam in your comments, enable the Google Recaptcha integration we added. Copy the plugin's `comments.yaml` to `user/config/plugins/comments.yaml` and enable `use_captcha`. Also add the Google Recaptcha API keys to allow it to work correctly.
+The plugin comes with Recaptcha integration. To make it work, add your own Recaptcha `site` and `secret` keys the the plugin yaml config file.
 
 # Where are the comments stored?
 
@@ -61,7 +61,7 @@ Further improvements to the comments visualization will be added in the next rel
 
 # Email notifications
 
-Upon receiving a comment, if `enable_email_notifications` is enabled, the Comments plugin will send an email to the `notifications_email_to` address set in the plugin options.
+The plugin interacts with the Email plugin to send emails upon receiving a comment.
 
 # Things still missing
 
