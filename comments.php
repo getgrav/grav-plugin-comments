@@ -25,6 +25,7 @@ class CommentsPlugin extends Plugin
             'onPluginsInitialized' => ['onPluginsInitialized', 0],
             'onFormProcessed' => ['onFormProcessed', 0],
             'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
         ];
     }
 
@@ -33,15 +34,25 @@ class CommentsPlugin extends Plugin
      */
     public function onPageInitialized()
     {
-        /** @var Page $page */
-        $page = $this->grav['page'];
-        if (!$page) {
-            return;
-        }
+        if (!$this->isAdmin()) {
+            /** @var Page $page */
+            $page = $this->grav['page'];
+            if (!$page) {
+                return;
+            }
 
-        $header = $page->header();
-        $header->form = $this->grav['config']->get('plugins.comments.form');
-        $page->header($header);
+            $header = $page->header();
+            if (!isset($header->form)) {
+                $header->form = $this->grav['config']->get('plugins.comments.form');
+                $page->header($header);
+            }
+        }
+    }
+
+    public function onTwigSiteVariables() {
+        if (!$this->isAdmin()) {
+            $this->grav['twig']->comments = $this->fetchComments();
+        }
     }
 
     /**
@@ -53,8 +64,6 @@ class CommentsPlugin extends Plugin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
             ]);
-
-            $this->grav['twig']->comments = $this->fetchComments();
 
         } else {
 
