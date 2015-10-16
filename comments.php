@@ -116,7 +116,7 @@ class CommentsPlugin extends Plugin
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
-            if (strpos($uri->path(), '/admin/' . $this->route) === false) {
+            if (strpos($uri->path(), $this->config->get('plugins.admin.route') . '/' . $this->route) === false) {
                 return;
             }
 
