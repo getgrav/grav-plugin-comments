@@ -16,6 +16,8 @@ Or clone from GitHub and put in the `user/plugins/comments` folder.
 
 # Usage
 
+Edit the
+
 Add `{% include 'partials/comments.html.twig' with {'page': page} %}` to the template file where you want to add comments.
 
 For example, in Antimatter, in `templates/item.html.twig`:
@@ -43,7 +45,9 @@ For example, in Antimatter, in `templates/item.html.twig`:
 {% endembed %}
 ```
 
-The comment form will appear to the blog post items.
+The comment form will appear on the blog post items matching the enabled routes.
+
+To set the enabled routes, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and edit the `enable_on_routes` and `disable_on_routes` options according to your needs.
 
 # Enabling Recaptcha
 
@@ -61,13 +65,11 @@ Further improvements to the comments visualization will be added in the next rel
 
 # Email notifications
 
-The plugin interacts with the Email plugin to send emails upon receiving a comment.
+The plugin interacts with the Email plugin to send emails upon receiving a comment. Configure the Email plugin correctly, setting its "Email from" and "Email to" email addresses.
 
 # Things still missing
 
-- Add language file
 - Allow to delete comments from the Admin Plugin
-- Allow some pages to disable adding comments
 - Ability to see all comments of a page in the Admin Plugin
 - Ability to reply to a comment from the Admin Plugin
 - Auto-fill the comment form when a user is logged in
