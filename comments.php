@@ -245,21 +245,22 @@ class CommentsPlugin extends Plugin
 
         $files = [];
         $files = $this->getFilesOrderedByModifiedDate();
-
         $comments = [];
 
         foreach($files as $file) {
             $data = Yaml::parse(file_get_contents($file->filePath));
+
             for ($i = 0; $i < count($data['comments']); $i++) {
-                $commentDate = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
+                $commentTimestamp = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
                 $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
 
-                if ($commentDate < $sevenDaysAgo) {
+                if ($commentTimestamp < $sevenDaysAgo) {
                     continue;
                 }
 
                 $data['comments'][$i]['pageTitle'] = $data['title'];
                 $data['comments'][$i]['filePath'] = $file->filePath;
+                $data['comments'][$i]['timestamp'] = $commentTimestamp;
             }
             if (count($data['comments'])) {
                 $comments = array_merge($comments, $data['comments']);
@@ -268,7 +269,7 @@ class CommentsPlugin extends Plugin
 
         // Order comments by date
         usort($comments, function($a, $b) {
-            return !($a['date'] > $b['date']);
+            return !($a['timestamp'] > $b['timestamp']);
         });
 
         $totalAvailable = count($comments);
