@@ -129,6 +129,7 @@ class CommentsPlugin extends Plugin
             }
 
             $this->grav['twig']->comments = $comments;
+            $this->grav['twig']->pages = $this->fetchPages();
         }
     }
 
@@ -294,6 +295,27 @@ class CommentsPlugin extends Plugin
 
         return $this->getDataFromFilename($filename)['comments'];
     }
+
+    /**
+     * Return the latest commented pages
+     */
+    private function fetchPages() {
+        $files = [];
+        $files = $this->getFilesOrderedByModifiedDate();
+
+        $pages = [];
+
+        foreach($files as $file) {
+            $pages[] = [
+                'title' => $file->data['title'],
+                'commentsCount' => count($file->data['comments']),
+                'lastCommentDate' => gmdate('D, d M Y H:i:s', $file->modifiedDate)
+            ];
+        }
+
+        return $pages;
+    }
+
 
     /**
      * Given a data file route, return the YAML content already parsed
