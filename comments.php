@@ -42,10 +42,12 @@ class CommentsPlugin extends Plugin
                 return;
             }
 
-            $header = $page->header();
-            if (!isset($header->form)) {
-                $header->form = $this->grav['config']->get('plugins.comments.form');
-                $page->header($header);
+            if ($this->enable) {
+                $header = $page->header();
+                if (!isset($header->form)) {
+                    $header->form = $this->grav['config']->get('plugins.comments.form');
+                    $page->header($header);
+                }
             }
         }
     }
