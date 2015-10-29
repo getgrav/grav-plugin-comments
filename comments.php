@@ -114,7 +114,8 @@ class CommentsPlugin extends Plugin
             //Admin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
-                'onAdminTemplateNavPluginHook' => ['onAdminTemplateNavPluginHook', 0],
+                'onAdminMenu' => ['onAdminMenu', 0],
+                'onAdminTemplateNavPluginHook' => ['onAdminMenu', 0], //DEPRECATED
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
@@ -354,7 +355,7 @@ class CommentsPlugin extends Plugin
     /**
      * Add navigation item to the admin plugin
      */
-    public function onAdminTemplateNavPluginHook()
+    public function onAdminMenu()
     {
         $this->grav['twig']->plugins_hooked_nav['PLUGIN_COMMENTS.COMMENTS'] = ['route' => $this->route, 'icon' => 'fa-file-text'];
     }
