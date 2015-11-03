@@ -22,3 +22,15 @@ it:
     EMAIL: Email:
     WRITTEN_ON: Scritto il
     BY: da
+fr:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Ajouter un commentaire
+    COMMENTS: Commentaires
+    EMAIL_NOT_CONFIGURED: Email non configurée
+    NEW_COMMENT_EMAIL_SUBJECT: 'Nouveau commentaire sur %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Un nouveau commentaire a été posté sur %1$s par %3$s (%4$s).</p><p>Page: %2$s</p><p>Texte: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Nom:
+    EMAIL: Email:
+    WRITTEN_ON: Ecrit le
+    BY: par
