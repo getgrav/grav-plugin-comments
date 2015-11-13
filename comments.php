@@ -1,6 +1,7 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Filesystem\Folder;
 use Grav\Common\GPM\GPM;
 use Grav\Common\Grav;
 use Grav\Common\Page\Page;
@@ -203,6 +204,10 @@ class CommentsPlugin extends Plugin
 
         if (!$path) {
             $path = DATA_DIR . 'comments';
+        }
+
+        if (!file_exists($path)) {
+            Folder::mkdir($path);
         }
 
         $dirItr     = new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
