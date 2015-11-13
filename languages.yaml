@@ -22,3 +22,15 @@ it:
     EMAIL: Email:
     WRITTEN_ON: Scritto il
     BY: da
+ru:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Добавить комментарий
+    COMMENTS: Комментарии
+    EMAIL_NOT_CONFIGURED: Email не настроен
+    NEW_COMMENT_EMAIL_SUBJECT: 'Новый комментарий к %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Новый комментарий был сделан на %1$s by %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Имя:
+    EMAIL: Email:
+    WRITTEN_ON: Написан в
+    BY: от
