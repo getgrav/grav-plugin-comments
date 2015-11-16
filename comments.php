@@ -177,7 +177,7 @@ class CommentsPlugin extends Plugin
 
                     $data['comments'][] = [
                         'text' => $text,
-                        'date' => gmdate('D, d M Y H:i:s', time()),
+                        'date' => date('D, d M Y H:i:s', time()),
                         'author' => $name,
                         'email' => $email
                     ];
@@ -187,7 +187,7 @@ class CommentsPlugin extends Plugin
                         'lang' => $lang,
                         'comments' => array([
                             'text' => $text,
-                            'date' => gmdate('D, d M Y H:i:s', time()),
+                            'date' => date('D, d M Y H:i:s', time()),
                             'author' => $name,
                             'email' => $email
                         ])
@@ -317,7 +317,7 @@ class CommentsPlugin extends Plugin
             $pages[] = [
                 'title' => $file->data['title'],
                 'commentsCount' => count($file->data['comments']),
-                'lastCommentDate' => gmdate('D, d M Y H:i:s', $file->modifiedDate)
+                'lastCommentDate' => date('D, d M Y H:i:s', $file->modifiedDate)
             ];
         }
 
