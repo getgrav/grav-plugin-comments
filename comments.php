@@ -1,6 +1,7 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Filesystem\Folder;
 use Grav\Common\GPM\GPM;
 use Grav\Common\Grav;
 use Grav\Common\Page\Page;
@@ -114,7 +115,8 @@ class CommentsPlugin extends Plugin
             //Admin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
-                'onAdminTemplateNavPluginHook' => ['onAdminTemplateNavPluginHook', 0],
+                'onAdminMenu' => ['onAdminMenu', 0],
+                'onAdminTemplateNavPluginHook' => ['onAdminMenu', 0], //DEPRECATED
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
@@ -175,7 +177,7 @@ class CommentsPlugin extends Plugin
 
                     $data['comments'][] = [
                         'text' => $text,
-                        'date' => gmdate('D, d M Y H:i:s', time()),
+                        'date' => date('D, d M Y H:i:s', time()),
                         'author' => $name,
                         'email' => $email
                     ];
@@ -185,7 +187,7 @@ class CommentsPlugin extends Plugin
                         'lang' => $lang,
                         'comments' => array([
                             'text' => $text,
-                            'date' => gmdate('D, d M Y H:i:s', time()),
+                            'date' => date('D, d M Y H:i:s', time()),
                             'author' => $name,
                             'email' => $email
                         ])
@@ -202,6 +204,10 @@ class CommentsPlugin extends Plugin
 
         if (!$path) {
             $path = DATA_DIR . 'comments';
+        }
+
+        if (!file_exists($path)) {
+            Folder::mkdir($path);
         }
 
         $dirItr     = new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
@@ -311,7 +317,7 @@ class CommentsPlugin extends Plugin
             $pages[] = [
                 'title' => $file->data['title'],
                 'commentsCount' => count($file->data['comments']),
-                'lastCommentDate' => gmdate('D, d M Y H:i:s', $file->modifiedDate)
+                'lastCommentDate' => date('D, d M Y H:i:s', $file->modifiedDate)
             ];
         }
 
@@ -354,7 +360,7 @@ class CommentsPlugin extends Plugin
     /**
      * Add navigation item to the admin plugin
      */
-    public function onAdminTemplateNavPluginHook()
+    public function onAdminMenu()
     {
         $this->grav['twig']->plugins_hooked_nav['PLUGIN_COMMENTS.COMMENTS'] = ['route' => $this->route, 'icon' => 'fa-file-text'];
     }

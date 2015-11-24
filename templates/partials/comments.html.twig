@@ -3,7 +3,7 @@
     <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
 
     <form name="{{ grav.config.plugins.comments.form.name }}"
-          action="{{ uri.rootUrl ~ (grav.config.plugins.comments.form.action|default(page.route)) }}"
+          action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}"
           method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
     {% for field in grav.config.plugins.comments.form.fields %}
 
@@ -21,6 +21,8 @@
             <button class="button" type="{{ button.type|default('submit') }}">{{ button.value|default('Submit') }}</button>
         {% endfor %}
         </div>
+
+        {{ nonce_field('form', 'form-nonce') }}
     </form>
 
     <div class="alert">{{ form.message }}</div>
