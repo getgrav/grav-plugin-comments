@@ -1,3 +1,15 @@
+# v1.1.0
+## 11/24/2015
+
+1. [](#improved)
+    Use date instead of gmdate to respect the server local time (thanks @bovisp)
+1. [](#improved)
+    Now works with multilang (thanks @bovisp)
+1. [](#new)
+    Added french (@codebee-fr) and russian (@joomline) languages
+1. [](#new)
+    Takes advantage of the new nonce support provided by the Form plugin
+
 # v1.0.2
 ## 11/13/2015
 
