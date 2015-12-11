@@ -35,9 +35,9 @@
             {% for comment in grav.twig.comments|array_reverse %}
             <tr>
                 <td>
-                    {{comment.text|e}}
+                    {{comment.text}}
                     <br />
-                    {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author|e}}
+                    {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
                 </td>
             </tr>
             {% endfor %}
