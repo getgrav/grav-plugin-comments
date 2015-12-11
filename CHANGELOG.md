@@ -1,3 +1,9 @@
+# v1.1.2
+## 12/11/2015
+
+1. [](#improved)
+    Fix double escaping comments text and author
+
 # v1.1.1
 ## 12/10/2015
 
