@@ -26,7 +26,7 @@ class CommentsPlugin extends Plugin
         return [
             'onPluginsInitialized' => ['onPluginsInitialized', 0],
             'onFormProcessed' => ['onFormProcessed', 0],
-            'onPageInitialized' => ['onPageInitialized', 0],
+            'onPageInitialized' => ['onPageInitialized', 10],
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
         ];
     }
