@@ -1,5 +1,5 @@
 # v1.1.3
-## 01/06/2015
+## 01/06/2016
 
 1. [](#improved)
     * Disable captcha by default, added instructions on how to enable it
