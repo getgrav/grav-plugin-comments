@@ -1,3 +1,11 @@
+# v1.1.3
+## 01/06/2015
+
+1. [](#improved)
+    * Disable captcha by default, added instructions on how to enable it
+1. [](#bugfix)
+    * Increase priority for onPageInitialized in the comments plugin over the form plugin one to prevent an issue when saving comments
+
 # v1.1.2
 ## 12/11/2015
 
