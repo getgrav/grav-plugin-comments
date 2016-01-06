@@ -16,8 +16,6 @@ Or clone from GitHub and put in the `user/plugins/comments` folder.
 
 # Usage
 
-Edit the
-
 Add `{% include 'partials/comments.html.twig' with {'page': page} %}` to the template file where you want to add comments.
 
 For example, in Antimatter, in `templates/item.html.twig`:
@@ -49,9 +47,12 @@ The comment form will appear on the blog post items matching the enabled routes.
 
 To set the enabled routes, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and edit the `enable_on_routes` and `disable_on_routes` options according to your needs.
 
+> Make sure you configured the "Email from" and "Email to" email addresses in the Email plugin with your email address!
+
 # Enabling Recaptcha
 
-The plugin comes with Recaptcha integration. To make it work, add your own Recaptcha `site` and `secret` keys the the plugin yaml config file.
+The plugin comes with Recaptcha integration. To make it work, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and uncomment the capthca form field and the captcha validation process.
+Make sure you add your own Recaptcha `site` and `secret` keys too.
 
 # Where are the comments stored?
 
