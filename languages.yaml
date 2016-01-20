@@ -46,3 +46,15 @@ ru:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+pl:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Dodaj komentarz
+    COMMENTS: Komentarzy
+    EMAIL_NOT_CONFIGURED: Email jest nie skofigurowany
+    NEW_COMMENT_EMAIL_SUBJECT: 'Nowy komentarz %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Pojawił się nowy komentarz, napisany %1$s przez %3$s (%4$s).</p><p>Strona: %2$s</p><p>Treść: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Imię:
+    EMAIL: Email:
+    WRITTEN_ON: Napisany przez
+    BY: przez
