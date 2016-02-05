@@ -1,3 +1,10 @@
+# v1.1.4
+## 02/05/2016
+
+1. [](#improved)
+    * Added german and polish
+    * Avoid listening on onTwigTemplatePaths if not enabled
+
 # v1.1.3
 ## 01/06/2016
 
