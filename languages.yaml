@@ -10,6 +10,16 @@ en:
     EMAIL: Email:
     WRITTEN_ON: Written on
     BY: by
+    NAME_LABEL: "Name"
+    NAME_PLACEHOLDER: "Enter your name"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Enter your email address"
+    MESSAGE_LABEL: "Comment"
+    MESSAGE_PLACEHOLDER: "Enter your comment"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Submit"
+    EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] from {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Thank you for writing your comment!"
+
 fr:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Ajouter un commentaire
@@ -34,6 +44,16 @@ it:
     EMAIL: Email:
     WRITTEN_ON: Scritto il
     BY: da
+    NAME_LABEL: "Nome"
+    NAME_PLACEHOLDER: "Inserisci il tuo nome"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Inserisci il tuo indirizzo email"
+    MESSAGE_LABEL: "Messaggio"
+    MESSAGE_PLACEHOLDER: "Inserisci il tuo commento"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Invia"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Nuovo commento] da {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Grazie per il tuo commento!"
+
 ru:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Добавить комментарий

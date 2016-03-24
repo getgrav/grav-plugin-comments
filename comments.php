@@ -117,7 +117,6 @@ class CommentsPlugin extends Plugin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
                 'onAdminMenu' => ['onAdminMenu', 0],
-                'onAdminTemplateNavPluginHook' => ['onAdminMenu', 0], //DEPRECATED
                 'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
             ]);
 
