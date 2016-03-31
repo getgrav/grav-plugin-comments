@@ -2,8 +2,6 @@
 
 The **Comments Plugin** for [Grav](http://github.com/getgrav/grav) adds the ability to add comments to pages, and moderate them.
 
-| IMPORTANT!!! This plugin is currently in development as is to be considered a **beta release**.  As such, use this in a production environment **at your own risk!**. More features will be added in the future.
-
 # Installation
 
 The Comments plugin is easy to install with GPM.
