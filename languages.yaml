@@ -10,7 +10,15 @@ de:
     EMAIL: Email:
     WRITTEN_ON: geschrieben am
     BY: von
-
+    NAME_LABEL: "Name"
+    NAME_PLACEHOLDER: "Namen eingeben"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Email-Adresse eingeben"
+    MESSAGE_LABEL: "Kommentar"
+    MESSAGE_PLACEHOLDER: "Kommentar eingeben"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Absenden"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Neuer Kommentar] von {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Vielen Dank für den Kommentar!"
 en:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Add a comment
