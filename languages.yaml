@@ -110,3 +110,25 @@ ru:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+
+pt-br:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Escreva um comentário
+    COMMENTS: Comentários
+    EMAIL_NOT_CONFIGURED: E-mail não configurado
+    NEW_COMMENT_EMAIL_SUBJECT: 'Novo comentário em %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Um novo comentário foi feito em %1$s por %3$s (%4$s).</p><p>Página: %2$s</p><p>Texto: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Name:
+    EMAIL: Email:
+    WRITTEN_ON: Publicado em
+    BY: por
+    NAME_LABEL: "Nome"
+    NAME_PLACEHOLDER: "Escreva seu nome"
+    EMAIL_LABEL: "E-mail"
+    EMAIL_PLACEHOLDER: "Escreva seu e-mail. Ex.: seunome@provedor.com.br"
+    MESSAGE_LABEL: "Comentário"
+    MESSAGE_PLACEHOLDER: "Escreva seu comentário"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Enviar"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Novo comentário] de {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Obrigada por enviar seu comentário!"
