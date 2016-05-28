@@ -41,6 +41,28 @@ en:
     EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] from {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Thank you for writing your comment!"
 
+es:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Agregar un comentario
+    COMMENTS: Comentarios
+    EMAIL_NOT_CONFIGURED: El Email no está configurado
+    NEW_COMMENT_EMAIL_SUBJECT: 'Nuevo comentario en %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Un nuevo comentario se hizo en %1$s por %3$s (%4$s).</p><p>Page: %2$s</p><p>Text: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Nombre:
+    EMAIL: Email:
+    WRITTEN_ON: Escrito en
+    BY: por
+    NAME_LABEL: "Nombre"
+    NAME_PLACEHOLDER: "Escriba su nombre"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Escriba su email"
+    MESSAGE_LABEL: "Comentario"
+    MESSAGE_PLACEHOLDER: "Escriba su comentario"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Enviar"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Nuevo comentario] de {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Gracias por escribir su comentario!"
+    
 fr:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Ajouter un commentaire
