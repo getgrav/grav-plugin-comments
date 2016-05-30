@@ -102,12 +102,9 @@ class CommentsPlugin extends Plugin
         if (!$this->isAdmin()) {
 
             $this->calculateEnable();
-
-            if ($this->enable) {
-                $this->enable([
-                    'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-                ]);
-            }
+            $this->enable([
+                'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+            ]);
 
         } else {
             /** @var Uri $uri */
