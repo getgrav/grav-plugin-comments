@@ -49,12 +49,12 @@ To set the enabled routes, create a `user/config/plugins/comments.yaml` file, co
 
 # Enabling Recaptcha
 
-The plugin comes with Recaptcha integration. To make it work, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and uncomment the capthca form field and the captcha validation process.
+The plugin comes with Recaptcha integration. To make it work, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and uncomment the captcha form field and the captcha validation process.
 Make sure you add your own Recaptcha `site` and `secret` keys too.
 
 # Where are the comments stored?
 
-In the `user/data/comments` folder. They're organized by page route, so every page with a comment has a corresponding file. This enabled a quick load of all the page comments.
+In the `user/data/comments` folder. They're organized by page route, so every page with a comment has a corresponding file. This enables a quick load of all the page comments.
 
 # Visualize comments
 
