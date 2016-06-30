@@ -174,6 +174,12 @@ class CommentsPlugin extends Plugin
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
                 $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 
+                $user = $this->grav['user'];
+                if ($user->authenticated) {
+                    $name = $user->fullname;
+                    $email = $user->email;
+                }
+
                 /** @var Language $language */
                 $language = $this->grav['language'];
                 $lang = $language->getLanguage();

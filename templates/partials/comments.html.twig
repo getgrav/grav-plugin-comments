@@ -11,9 +11,21 @@
             {% if field.evaluateDefault %}
                 {% set value = evaluate(field.evaluateDefault) %}
             {% endif %}
-            <div>
-                {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-            </div>
+            {% if grav.user.authenticated %}
+                {% if field.name == 'name' %}
+                    <input type="hidden" name="{{field.name}}" value="{{grav.user.fullname}}">
+                {% elseif field.name == 'email' %}
+                    <input type="hidden" name="{{field.name}}" value="{{grav.user.email}}">
+                {% else %}
+                    <div>
+                        {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                    </div>                
+                {% endif %}
+            {% else %}
+                <div>
+                    {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                </div>
+            {% endif %}
         {% endfor %}
 
         <div class="buttons">
