@@ -72,5 +72,6 @@ form:
 #            recatpcha_secret: ej32oiej23oiej32oijeoi32jeio32je
         - addComment:
         - message: PLUGIN_COMMENTS.THANK_YOU_MESSAGE
+        - reset: true
 
 
