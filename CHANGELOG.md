@@ -1,11 +1,14 @@
-# v1.1.5
-## xx/xx/2016
+# v1.2.0
+## 07/14/2016
 
 1. [](#improved)
     * Prevent a missing template problem on ignored routes
     * Allow to translate the comments form
     * Added spanish and brazilian portuguese translations
     * Enhanced german, russian and french translations
+    * Added cache for comments
+    * Handle logged in users by not requiring username/email
+    * Reset the comments form after a comment is submitted
 
 # v1.1.4
 ## 02/05/2016
