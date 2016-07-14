@@ -17,17 +17,15 @@ class CommentsPlugin extends Plugin
 {
     protected $route = 'comments';
     protected $enable = false;
-
+    protected $comments_cache_id;
+    
     /**
      * @return array
      */
     public static function getSubscribedEvents()
     {
         return [
-            'onPluginsInitialized' => ['onPluginsInitialized', 0],
-            'onFormProcessed' => ['onFormProcessed', 0],
-            'onPageInitialized' => ['onPageInitialized', 10],
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            'onPluginsInitialized' => ['onPluginsInitialized', 0]
         ];
     }
 
@@ -36,31 +34,24 @@ class CommentsPlugin extends Plugin
      */
     public function onPageInitialized()
     {
-        if (!$this->isAdmin()) {
-            /** @var Page $page */
-            $page = $this->grav['page'];
-            if (!$page) {
-                return;
-            }
+        /** @var Page $page */
+        $page = $this->grav['page'];
+        if (!$page) {
+            return;
+        }
 
-            if ($this->enable) {
-                $header = $page->header();
-                if (!isset($header->form)) {
-                    $header->form = $this->grav['config']->get('plugins.comments.form');
-                    $page->header($header);
-                }
+        if ($this->enable) {
+            $header = $page->header();
+            if (!isset($header->form)) {
+                $header->form = $this->grav['config']->get('plugins.comments.form');
+                $page->header($header);
             }
         }
     }
 
     public function onTwigSiteVariables() {
-        if (!$this->isAdmin()) {
-            $this->grav['twig']->enable = $this->enable;
-
-            if ($this->enable) {
-                $this->grav['twig']->comments = $this->fetchComments();
-            }
-        }
+        $this->grav['twig']->enable = $this->enable;
+        $this->grav['twig']->comments = $this->fetchComments();
     }
 
     /**
@@ -96,45 +87,64 @@ class CommentsPlugin extends Plugin
     }
 
     /**
+     * Frontend side initialization
+     */
+    public function initializeFrontend()
+    {
+        $this->calculateEnable();
+        
+        if ($this->enable) {
+            $this->enable([
+                'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+                'onFormProcessed' => ['onFormProcessed', 0],
+                'onPageInitialized' => ['onPageInitialized', 10],
+                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            ]);
+        }
+        
+        $cache = $this->grav['cache'];
+        //init cache id
+        $this->comments_cache_id = md5('comments-data' . $cache->getKey());
+    }
+    
+    /**
+     * Admin side initialization
+     */
+    public function initializeAdmin()
+    {
+        /** @var Uri $uri */
+        $uri = $this->grav['uri'];
+
+        $this->enable([
+            'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
+            'onAdminMenu' => ['onAdminMenu', 0],
+            'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
+        ]);
+
+        if (strpos($uri->path(), $this->config->get('plugins.admin.route') . '/' . $this->route) === false) {
+            return;
+        }
+
+        $page = $this->grav['uri']->param('page');
+        $comments = $this->getLastComments($page);
+
+        if ($page > 0) {
+            echo json_encode($comments);
+            exit();
+        }
+
+        $this->grav['twig']->comments = $comments;
+        $this->grav['twig']->pages = $this->fetchPages();
+    }
+    
+    /**
      */
     public function onPluginsInitialized()
     {
-        if (!$this->isAdmin()) {
-
-            $this->calculateEnable();
-
-            if ($this->enable) {
-                $this->enable([
-                    'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-                ]);
-            }
-
+        if ($this->isAdmin()) {
+            $this->initializeAdmin();
         } else {
-            /** @var Uri $uri */
-            $uri = $this->grav['uri'];
-
-            //Admin
-            $this->enable([
-                'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
-                'onAdminMenu' => ['onAdminMenu', 0],
-                'onAdminTemplateNavPluginHook' => ['onAdminMenu', 0], //DEPRECATED
-                'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
-            ]);
-
-            if (strpos($uri->path(), $this->config->get('plugins.admin.route') . '/' . $this->route) === false) {
-                return;
-            }
-
-            $page = $this->grav['uri']->param('page');
-            $comments = $this->getLastComments($page);
-
-            if ($page > 0) {
-                echo json_encode($comments);
-                exit();
-            }
-
-            $this->grav['twig']->comments = $comments;
-            $this->grav['twig']->pages = $this->fetchPages();
+            $this->initializeFrontend();
         }
     }
 
@@ -163,6 +173,12 @@ class CommentsPlugin extends Plugin
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
                 $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+
+                $user = $this->grav['user'];
+                if ($user->authenticated) {
+                    $name = $user->fullname;
+                    $email = $user->email;
+                }
 
                 /** @var Language $language */
                 $language = $this->grav['language'];
@@ -196,6 +212,10 @@ class CommentsPlugin extends Plugin
                 }
 
                 $file->save(Yaml::dump($data));
+
+                //clear cache
+                $this->grav['cache']->delete($this->comments_cache_id);
+
                 break;
         }
     }
@@ -298,11 +318,20 @@ class CommentsPlugin extends Plugin
      * Return the comments associated to the current route
      */
     private function fetchComments() {
+        $cache = $this->grav['cache'];
+        //search in cache
+        if ($comments = $cache->fetch($this->comments_cache_id)) {
+            return $comments;
+        }
+        
         $lang = $this->grav['language']->getLanguage();
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
 
-        return $this->getDataFromFilename($filename)['comments'];
+        $comments = $this->getDataFromFilename($filename)['comments'];
+        //save to cache if enabled
+        $cache->save($this->comments_cache_id, $comments);
+        return $comments;
     }
 
     /**

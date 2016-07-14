@@ -1,3 +1,15 @@
+# v1.2.0
+## 07/14/2016
+
+1. [](#improved)
+    * Prevent a missing template problem on ignored routes
+    * Allow to translate the comments form
+    * Added spanish and brazilian portuguese translations
+    * Enhanced german, russian and french translations
+    * Added cache for comments
+    * Handle logged in users by not requiring username/email
+    * Reset the comments form after a comment is submitted
+
 # v1.1.4
 ## 02/05/2016
 
@@ -25,7 +37,7 @@
 1. [](#improved)
     * Drop the autofocus on the comment form
 1. [](#bugfix)
-    * Fix double encoding (#12)    
+    * Fix double encoding (#12)
 
 # v1.1.0
 ## 11/24/2015
@@ -36,7 +48,7 @@
 1. [](#improved)
     * Use date instead of gmdate to respect the server local time (thanks @bovisp)
     * Now works with multilang (thanks @bovisp)
-   
+
 
 # v1.0.2
 ## 11/13/2015

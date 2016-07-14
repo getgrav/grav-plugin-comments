@@ -5,20 +5,32 @@
     <form name="{{ grav.config.plugins.comments.form.name }}"
           action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}"
           method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
-    {% for field in grav.config.plugins.comments.form.fields %}
 
-        {% set value = form.value(field.name) %}
-        {% if field.evaluateDefault %}
-            {% set value = evaluate(field.evaluateDefault) %}
-        {% endif %}
-        <div>
-            {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-        </div>
-    {% endfor %}
+        {% for field in grav.config.plugins.comments.form.fields %}
+            {% set value = form.value(field.name) %}
+            {% if field.evaluateDefault %}
+                {% set value = evaluate(field.evaluateDefault) %}
+            {% endif %}
+            {% if grav.user.authenticated %}
+                {% if field.name == 'name' %}
+                    <input type="hidden" name="{{field.name}}" value="{{grav.user.fullname}}">
+                {% elseif field.name == 'email' %}
+                    <input type="hidden" name="{{field.name}}" value="{{grav.user.email}}">
+                {% else %}
+                    <div>
+                        {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                    </div>                
+                {% endif %}
+            {% else %}
+                <div>
+                    {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                </div>
+            {% endif %}
+        {% endfor %}
 
         <div class="buttons">
         {% for button in grav.config.plugins.comments.form.buttons %}
-            <button class="button" type="{{ button.type|default('submit') }}">{{ button.value|default('Submit') }}</button>
+            <button class="button" type="{{ button.type|default('submit') }}">{{ button.value|t|default('Submit') }}</button>
         {% endfor %}
         </div>
 

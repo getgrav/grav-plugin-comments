@@ -2,8 +2,6 @@
 
 The **Comments Plugin** for [Grav](http://github.com/getgrav/grav) adds the ability to add comments to pages, and moderate them.
 
-| IMPORTANT!!! This plugin is currently in development as is to be considered a **beta release**.  As such, use this in a production environment **at your own risk!**. More features will be added in the future.
-
 # Installation
 
 The Comments plugin is easy to install with GPM.
@@ -51,12 +49,12 @@ To set the enabled routes, create a `user/config/plugins/comments.yaml` file, co
 
 # Enabling Recaptcha
 
-The plugin comes with Recaptcha integration. To make it work, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and uncomment the capthca form field and the captcha validation process.
+The plugin comes with Recaptcha integration. To make it work, create a `user/config/plugins/comments.yaml` file, copy in it the contents of `user/plugins/comments/comments.yaml` and uncomment the captcha form field and the captcha validation process.
 Make sure you add your own Recaptcha `site` and `secret` keys too.
 
 # Where are the comments stored?
 
-In the `user/data/comments` folder. They're organized by page route, so every page with a comment has a corresponding file. This enabled a quick load of all the page comments.
+In the `user/data/comments` folder. They're organized by page route, so every page with a comment has a corresponding file. This enables a quick load of all the page comments.
 
 # Visualize comments
 
