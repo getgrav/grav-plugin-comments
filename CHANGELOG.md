@@ -1,3 +1,9 @@
+# v1.2.1
+## 07/xx/2016
+
+1. [](#bugfix)
+    * Check if Login plugin is installed before checking for user object [#28](https://github.com/getgrav/grav-plugin-comments/issues/28)
+
 # v1.2.0
 ## 07/14/2016
 

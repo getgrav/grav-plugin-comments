@@ -11,7 +11,7 @@
             {% if field.evaluateDefault %}
                 {% set value = evaluate(field.evaluateDefault) %}
             {% endif %}
-            {% if grav.user.authenticated %}
+            {% if config.plugins.login.enabled and grav.user.authenticated %}
                 {% if field.name == 'name' %}
                     <input type="hidden" name="{{field.name}}" value="{{grav.user.fullname}}">
                 {% elseif field.name == 'email' %}
