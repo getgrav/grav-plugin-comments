@@ -1,3 +1,11 @@
+# v1.2.2
+## 08/12/2016
+
+1. [](#improved)
+    * Added Romanian translation
+1. [](#bugfix)
+    * Fix issue in storing comments cache when cache is enabled [#33](https://github.com/getgrav/grav-plugin-comments/issues/33)
+
 # v1.2.1
 ## 07/19/2016
 

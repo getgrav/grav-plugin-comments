@@ -154,3 +154,24 @@ pt-br:
     SUBMIT_COMMENT_BUTTON_TEXT: "Enviar"
     EMAIL_NEW_COMMENT_SUBJECT: "[Novo comentário] de {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Obrigada por enviar seu comentário!"
+ro:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: 'Adăugați un comentariu'
+    COMMENTS: 'Comentarii'
+    EMAIL_NOT_CONFIGURED: 'Adresa de email nu este configurată'
+    NEW_COMMENT_EMAIL_SUBJECT: 'Comentariu nou pentru %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Un nou comentariu a fost adăugat la %1$s de către %3$s (%4$s).</p><p>Pagină: %2$s</p><p>Text: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: 'Nume:'
+    EMAIL: 'Adresă de email:'
+    WRITTEN_ON: 'Scris în data de'
+    BY: 'de către'
+    NAME_LABEL: "Numele"
+    NAME_PLACEHOLDER: "Introduceți numele Dvs."
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Introduceți adresa Dvs. de email"
+    MESSAGE_LABEL: "Comentariu"
+    MESSAGE_PLACEHOLDER: "Scrieți comentariul Dvs."
+    SUBMIT_COMMENT_BUTTON_TEXT: "Trimiteți"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Comentariu nou] from {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Vă mulțumim pentru comentariu!"
