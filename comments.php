@@ -18,7 +18,7 @@ class CommentsPlugin extends Plugin
     protected $route = 'comments';
     protected $enable = false;
     protected $comments_cache_id;
-    
+
     /**
      * @return array
      */
@@ -92,7 +92,7 @@ class CommentsPlugin extends Plugin
     public function initializeFrontend()
     {
         $this->calculateEnable();
-        
+
         if ($this->enable) {
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
@@ -101,12 +101,14 @@ class CommentsPlugin extends Plugin
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
             ]);
         }
-        
+
         $cache = $this->grav['cache'];
+        $uri = $this->grav['uri'];
+
         //init cache id
-        $this->comments_cache_id = md5('comments-data' . $cache->getKey());
+        $this->comments_cache_id = md5('comments-data' . $cache->getKey() . '-' . $uri->url());
     }
-    
+
     /**
      * Admin side initialization
      */
@@ -136,7 +138,7 @@ class CommentsPlugin extends Plugin
         $this->grav['twig']->comments = $comments;
         $this->grav['twig']->pages = $this->fetchPages();
     }
-    
+
     /**
      */
     public function onPluginsInitialized()
@@ -325,7 +327,7 @@ class CommentsPlugin extends Plugin
         if ($comments = $cache->fetch($this->comments_cache_id)) {
             return $comments;
         }
-        
+
         $lang = $this->grav['language']->getLanguage();
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
