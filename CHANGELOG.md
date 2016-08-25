@@ -1,3 +1,9 @@
+# v1.2.x
+## 08/xx/2016
+
+1. [](#improved)
+    * Added Croatian translation
+
 # v1.2.2
 ## 08/12/2016
 
