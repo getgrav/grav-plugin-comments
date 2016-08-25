@@ -85,6 +85,27 @@ fr:
     EMAIL_NEW_COMMENT_SUBJECT: "[Nouveau commentaire] de {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Merci d'avoir rédigé votre commentaire !"
     
+hr:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Dodaj komentar
+    COMMENTS: Komentari
+    EMAIL_NOT_CONFIGURED: Email adresa nije podešena
+    NEW_COMMENT_EMAIL_SUBJECT: 'Novi komentar na %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Novi komentar je napisan na %1$s od %3$s (%4$s).</p><p>Stranica:: %2$s</p><p>Tekst: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Ime:
+    EMAIL: Email:
+    WRITTEN_ON: Napisano je na
+    BY: od 
+    NAME_LABEL: "Ime"
+    NAME_PLACEHOLDER: "Unesite ime"
+    EMAIL_LABEL: "Email adresa"
+    EMAIL_PLACEHOLDER: "Unesite email adresu"
+    MESSAGE_LABEL: "Komentar"
+    MESSAGE_PLACEHOLDER: "Unesite komentar"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Pošalji"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Novi komentar] od {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Hvala Vam što ste napisali svoj komentar!"
 it:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Aggiungi un commento
