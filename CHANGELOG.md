@@ -1,3 +1,9 @@
+# v1.2.4
+## 09/15/2016
+
+1. [](#bugfix)
+    * Fix missing Twig template error if route is excluded but twig is loaded
+
 # v1.2.3
 ## 09/15/2016
 
