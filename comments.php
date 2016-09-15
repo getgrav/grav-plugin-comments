@@ -31,6 +31,10 @@ class CommentsPlugin extends Plugin
 
     /**
      * Initialize form if the page has one. Also catches form processing if user posts the form.
+     *
+     * Used by Form plugin < 2.0, kept for backwards compatibility
+     *
+     * @deprecated
      */
     public function onPageInitialized()
     {
@@ -49,8 +53,26 @@ class CommentsPlugin extends Plugin
         }
     }
 
+    /**
+     * Add the comment form information to the page header dynamically
+     *
+     * Used by Form plugin >= 2.0
+     */
+    public function onFormPageHeaderProcessed(Event $event)
+    {
+        $header = $event['header'];
+
+        if ($this->enable) {
+            if (!isset($header->form)) {
+                $header->form = $this->grav['config']->get('plugins.comments.form');
+            }
+        }
+
+        $event->header = $header;
+    }
+
     public function onTwigSiteVariables() {
-        $this->grav['twig']->enable = $this->enable;
+        $this->grav['twig']->enable_comments_plugin = $this->enable;
         $this->grav['twig']->comments = $this->fetchComments();
     }
 
@@ -97,6 +119,7 @@ class CommentsPlugin extends Plugin
             $this->enable([
                 'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
                 'onFormProcessed' => ['onFormProcessed', 0],
+                'onFormPageHeaderProcessed' => ['onFormPageHeaderProcessed', 0],
                 'onPageInitialized' => ['onPageInitialized', 10],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
             ]);
