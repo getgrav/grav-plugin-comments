@@ -1,8 +1,10 @@
 # v1.2.x
-## 08/xx/2016
+## 09/xx/2016
 
 1. [](#improved)
     * Added Croatian translation
+1. [](#bugfix)
+    * Fix [#35](https://github.com/getgrav/grav-plugin-comments/issues/35) Allow comments to work fine on Form 2.0 too
 
 # v1.2.2
 ## 08/12/2016
