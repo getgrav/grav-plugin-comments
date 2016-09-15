@@ -115,9 +115,12 @@ class CommentsPlugin extends Plugin
     {
         $this->calculateEnable();
 
+        $this->enable([
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+        ]);
+
         if ($this->enable) {
             $this->enable([
-                'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
                 'onFormProcessed' => ['onFormProcessed', 0],
                 'onFormPageHeaderProcessed' => ['onFormPageHeaderProcessed', 0],
                 'onPageInitialized' => ['onPageInitialized', 10],
