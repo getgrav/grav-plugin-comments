@@ -312,11 +312,6 @@ class CommentsPlugin extends Plugin
 
             for ($i = 0; $i < count($data['comments']); $i++) {
                 $commentTimestamp = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
-                $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
-
-                if ($commentTimestamp < $sevenDaysAgo) {
-                    continue;
-                }
 
                 $data['comments'][$i]['pageTitle'] = $data['title'];
                 $data['comments'][$i]['filePath'] = $file->filePath;

@@ -1,3 +1,9 @@
+# v1.2.x
+## 09/16/2016
+
+1. [](#bugfix)
+    * Fix [#37](https://github.com/getgrav/grav-plugin-comments/issues/37) showing comments older than one week in the "latest comments" view
+
 # v1.2.4
 ## 09/15/2016
 
