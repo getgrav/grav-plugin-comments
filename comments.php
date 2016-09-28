@@ -9,6 +9,7 @@ use Grav\Common\Page\Pages;
 use Grav\Common\Plugin;
 use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
 use Grav\Common\User\User;
+use Grav\Common\Utils;
 use RocketTheme\Toolbox\File\File;
 use RocketTheme\Toolbox\Event\Event;
 use Symfony\Component\Yaml\Yaml;
@@ -77,13 +78,6 @@ class CommentsPlugin extends Plugin
     }
 
     /**
-     * Determine if $haystack starts with $needle. Credit: http://stackoverflow.com/a/10473026/205039
-     */
-    private function startsWith($haystack, $needle) {
-        return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
-    }
-
-    /**
      * Determine if the plugin should be enabled based on the enable_on_routes and disable_on_routes config options
      */
     private function calculateEnable() {
@@ -99,7 +93,7 @@ class CommentsPlugin extends Plugin
                 $this->enable = true;
             } else {
                 foreach($enable_on_routes as $route) {
-                    if ($this->startsWith($path, $route)) {
+                    if (Utils::startsWith($path, $route)) {
                         $this->enable = true;
                         break;
                     }
