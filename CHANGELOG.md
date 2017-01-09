@@ -1,5 +1,5 @@
-# v1.2.x
-## 01/xx/2017
+# v1.2.6
+## 01/09/2017
 
 1. [](#improved)
     Use existing `Utils::startsWith()` method
