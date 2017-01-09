@@ -1,3 +1,11 @@
+# v1.2.x
+## 01/xx/2017
+
+1. [](#improved)
+    Use existing `Utils::startsWith()` method
+1. [](#bugfix)
+    * Fix [#41](https://github.com/getgrav/grav-plugin-comments/issues/41) using Comments in a Gantry-powered theme did not escape the comment form token correctly
+
 # v1.2.5
 ## 09/16/2016
 
