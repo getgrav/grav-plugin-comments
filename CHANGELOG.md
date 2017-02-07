@@ -1,3 +1,9 @@
+# v1.2.7
+## xx/xx/2017
+
+1. [](#improved)
+    Added Japanese translation
+
 # v1.2.6
 ## 01/09/2017
 
