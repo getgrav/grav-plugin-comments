@@ -130,6 +130,28 @@ it:
     EMAIL_NEW_COMMENT_SUBJECT: "[Nuovo commento] da {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Grazie per il tuo commento!"
 
+ja:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: コメントを追加する
+    COMMENTS: コメント
+    EMAIL_NOT_CONFIGURED: メールアドレスは設定さていません
+    NEW_COMMENT_EMAIL_SUBJECT: '%1$sについて新しいコメント'
+    NEW_COMMENT_EMAIL_BODY: '<p>新しいコメントが%1$sについて%3$sから(%4$s)書かれた.</p><p>ページー : %2$s</p><p>文書 : %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: 名前 :
+    EMAIL: メールアドレス :
+    WRITTEN_ON: に書かれた
+    BY: に
+    NAME_LABEL: "名前"
+    NAME_PLACEHOLDER: "お名前を"
+    EMAIL_LABEL: "メールアドレスを"
+    EMAIL_PLACEHOLDER: "ご自分のメールアドレスをここに..."
+    MESSAGE_LABEL: "コメント"
+    MESSAGE_PLACEHOLDER: "コメントをここに"
+    SUBMIT_COMMENT_BUTTON_TEXT: "送信する"
+    EMAIL_NEW_COMMENT_SUBJECT: "[新しいコメント]、 {{ form.value.name|e }}から"
+    THANK_YOU_MESSAGE: "コメントを書いてくださいましてありがとうございました！"
+
 pl:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Dodaj komentarz
