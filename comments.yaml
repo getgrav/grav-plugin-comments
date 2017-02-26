@@ -65,11 +65,11 @@ form:
           value: PLUGIN_COMMENTS.SUBMIT_COMMENT_BUTTON_TEXT
 
     process:
+#        - captcha:
+#            recatpcha_secret: ej32oiej23oiej32oijeoi32jeio32je
         - email:
             subject: PLUGIN_COMMENTS.EMAIL_NEW_COMMENT_SUBJECT
             body: "{% include 'forms/data.html.twig' %}"
-#        - captcha:
-#            recatpcha_secret: ej32oiej23oiej32oijeoi32jeio32je
         - addComment:
         - message: PLUGIN_COMMENTS.THANK_YOU_MESSAGE
         - reset: true
