@@ -1,4 +1,5 @@
 {% if grav.twig.enable_comments_plugin %}
+    {% set scope = scope ?: 'data.' %}
 
     <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
 
