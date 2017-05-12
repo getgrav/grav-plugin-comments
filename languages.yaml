@@ -41,6 +41,8 @@ en:
     SUBMIT_COMMENT_BUTTON_TEXT: "Submit"
     EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] from {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Thank you for writing your comment!"
+    LANGUAGE_STATUS: "Local Comments"
+    LANGUAGE_STATUS_HELP: "When enabled, only comments for the current page language will be displayed"
 
 es:
   PLUGIN_COMMENTS:
@@ -186,6 +188,8 @@ ru:
     SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
     EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] от {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Спасибо за ваш комментарий!"
+    LANGUAGE_STATUS: "Локальные комментарии"
+    LANGUAGE_STATUS_HELP: "При включении будут отображены комментарии только для текущего языка страницы"
 
 pt-br:
   PLUGIN_COMMENTS:

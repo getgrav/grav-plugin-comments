@@ -54,7 +54,7 @@
                         $('.js__comments-container').append('<tr>' +
                                 '<td class="e author">' + comment.author + '</td>' +
                                 '<td class="v comment">' + comment.text + '</td>' +
-                                '<td class="v details"><strong>Page</strong>: ' + comment.pageTitle + '<br>' +
+                                '<td class="v details"><strong>Page</strong>: <a href="' + comment.pageUrl + '">' + comment.pageTitle + '</a><br>' +
                                 '<strong>Date</strong>: ' + comment.date + '</td>' +
                             '</tr>');
                     })
@@ -89,7 +89,7 @@
                     <tr>
                         <td class="author">{{comment.author}}</td>
                         <td class="comment">{{comment.text}}</td>
-                        <td class="details"><strong>Page</strong>: {{comment.pageTitle}}<br>
+                        <td class="details"><strong>Page</strong>: <a href="{{ comment.pageUrl }}">{{comment.pageTitle}}</a><br>
                         <strong>Date</strong>: {{comment.date}}</td>
                     </tr>
                 {% endfor %}

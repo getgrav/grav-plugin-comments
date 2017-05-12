@@ -189,7 +189,7 @@ class CommentsPlugin extends Plugin
             case 'addComment':
                 $post = isset($_POST['data']) ? $_POST['data'] : [];
 
-                $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
+                $lang = $this->config->get('plugins.comments.is_lang');
                 $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
                 $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
@@ -206,7 +206,7 @@ class CommentsPlugin extends Plugin
 
                 /** @var Language $language */
                 $language = $this->grav['language'];
-                $lang = $language->getLanguage();
+                $lang = $lang ? $language->getLanguage() : $lang;
 
                 $filename = DATA_DIR . 'comments';
                 $filename .= ($lang ? '/' . $lang : '');
@@ -226,6 +226,7 @@ class CommentsPlugin extends Plugin
                     $data = array(
                         'title' => $title,
                         'lang' => $lang,
+                        'url' => $this->grav['uri']->path(),
                         'comments' => array([
                             'text' => $text,
                             'date' => date('D, d M Y H:i:s', time()),
@@ -263,9 +264,9 @@ class CommentsPlugin extends Plugin
         $filesItr = new \RegexIterator($itrItr, '/^.+\.yaml$/i');
 
         // Collect files if modified in the last 7 days
+        $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
         foreach ($filesItr as $filepath => $file) {
             $modifiedDate = $file->getMTime();
-            $sevenDaysAgo = time() - (7 * 24 * 60 * 60);
 
             if ($modifiedDate < $sevenDaysAgo) {
                 continue;
@@ -308,6 +309,7 @@ class CommentsPlugin extends Plugin
                 $commentTimestamp = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
 
                 $data['comments'][$i]['pageTitle'] = $data['title'];
+                $data['comments'][$i]['pageUrl'] = $data['url'];
                 $data['comments'][$i]['filePath'] = $file->filePath;
                 $data['comments'][$i]['timestamp'] = $commentTimestamp;
             }
@@ -343,7 +345,8 @@ class CommentsPlugin extends Plugin
             return $comments;
         }
 
-        $lang = $this->grav['language']->getLanguage();
+        $lang = $this->config->get('plugins.comments.is_lang');
+        $lang = $lang ? $this->grav['language']->getLanguage() : $lang;
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
 
