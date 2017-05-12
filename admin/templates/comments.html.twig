@@ -118,7 +118,7 @@
                     </tr>
                     {% for page in grav.twig.pages %}
                         <tr>
-                            <td class="page">{{page.title}}</td>
+                            <td class="page"><a href="{{ page.url }}">{{page.title}}</a></td>
                             <td class="number-of-comments">{{page.commentsCount}}</td>
                             <td class="last-comment-date">{{page.lastCommentDate}}</td>
                         </tr>

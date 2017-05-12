@@ -368,6 +368,7 @@ class CommentsPlugin extends Plugin
         foreach($files as $file) {
             $pages[] = [
                 'title' => $file->data['title'],
+                'url' => $file->data['url'],
                 'commentsCount' => count($file->data['comments']),
                 'lastCommentDate' => date('D, d M Y H:i:s', $file->modifiedDate)
             ];
