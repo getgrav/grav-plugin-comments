@@ -177,6 +177,15 @@ ru:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+    NAME_LABEL: "Имя"
+    NAME_PLACEHOLDER: "Введите ваше имя"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Введите ваш email"
+    MESSAGE_LABEL: "Комментарий"
+    MESSAGE_PLACEHOLDER: "Введите комментарий"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
+    EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] от {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Спасибо за ваш комментарий!"
 
 pt-br:
   PLUGIN_COMMENTS:
