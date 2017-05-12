@@ -187,7 +187,7 @@ class CommentsPlugin extends Plugin
 
         switch ($action) {
             case 'addComment':
-                $post = !empty($_POST) ? $_POST : [];
+                $post = isset($_POST['data']) ? $_POST['data'] : [];
 
                 $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
                 $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
