@@ -1,5 +1,5 @@
 # v1.2.7
-## xx/xx/2017
+## 05/12/2017
 
 1. [](#improved)
     * Added Japanese translation
