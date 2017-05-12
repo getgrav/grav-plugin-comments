@@ -6,6 +6,7 @@
     * Move captcha over email [#45](https://github.com/getgrav/grav-plugin-comments/issues/45)
 1. [](#bugfix)
     * Fix comment form processing
+    * Fix issue with scope for autofilled values
 
 # v1.2.6
 ## 01/09/2017
