@@ -189,12 +189,12 @@ class CommentsPlugin extends Plugin
             case 'addComment':
                 $post = isset($_POST['data']) ? $_POST['data'] : [];
 
-                $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
-                $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
-                $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
-                $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
-                $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+                $lang = filter_var(urldecode($_POST['lang']), FILTER_SANITIZE_STRING);
+                $path = filter_var(urldecode($_POST['path']), FILTER_SANITIZE_STRING);
+                $text = filter_var(urldecode($_POST['text']), FILTER_SANITIZE_STRING);
+                $name = filter_var(urldecode($_POST['name']), FILTER_SANITIZE_STRING);
+                $email = filter_var(urldecode($_POST['email']), FILTER_SANITIZE_STRING);
+                $title = filter_var(urldecode($_POST['title']), FILTER_SANITIZE_STRING);
 
                 if (isset($this->grav['user'])) {
                     $user = $this->grav['user'];
