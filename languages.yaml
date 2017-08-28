@@ -177,6 +177,37 @@ ru:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+    NAME_LABEL: "Имя"
+    NAME_PLACEHOLDER: "Введите свое имя"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Введите свой email"
+    MESSAGE_LABEL: "Комментарий"
+    MESSAGE_PLACEHOLDER: "Введите свой комментарий"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Новый комментарий] от {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Спасибо, что написали свой комментарий!"
+    
+uk:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Додати коментар
+    COMMENTS: Коментарі
+    EMAIL_NOT_CONFIGURED: Email не налаштований
+    NEW_COMMENT_EMAIL_SUBJECT: 'Новий коментар до %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Новий коментар був зроблений на %1$s від %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Имя:
+    EMAIL: Email:
+    WRITTEN_ON: Написаний в
+    BY: від
+    NAME_LABEL: "Ім'я"
+    NAME_PLACEHOLDER: "Введіть своє ім'я"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Введіть свій email"
+    MESSAGE_LABEL: "Коментар"
+    MESSAGE_PLACEHOLDER: "Введіть свій коментар"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Відправити"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Новий коментар] від {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Дякуємо, що написали свій коментар!"
 
 pt-br:
   PLUGIN_COMMENTS:
