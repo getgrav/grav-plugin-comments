@@ -16,6 +16,8 @@ use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
 
+require_once 'class\Comment.php';
+
 class CommentsPlugin extends Plugin
 {
     protected $route = 'comments';
@@ -402,9 +404,46 @@ class CommentsPlugin extends Plugin
         $filename .= $this->grav['uri']->path() . '.yaml';
 
         $comments = $this->getDataFromFilename($filename)['comments'];
+		$comments = setCommentLevels($comments);
         //save to cache if enabled
         $cache->save($this->comments_cache_id, $comments);
         return $comments;
+    }
+
+    /**
+     * Return the latest commented pages
+     */
+    private function setCommentLevels($comments) {
+		$levels = array();
+		$levelsflat = array();
+		foreach($comments as $key => $comment) {
+			//$comments[$key]['level'] = 0;
+			$levels[$comment['parent']][] = $comment['id'];
+			$levelsflat[$comment['id']]['parent'] = $comment['parent'];
+			$levelsflat[$comment['id']]['class'] = new Comment($comment['id'], $comments[$key]);
+		}
+		//get starting points (entries without valid parent = root element)
+		$leveltree = array();
+		foreach($levelsflat as $id => $parent) {
+			$parent_id = $parent['parent'];
+			if(!isset($levelsflat[$parent_id]){
+				$leveltree[$id] = $levelsflat[$id]['class'];
+				//$leveltree[$id] = array();
+				//$leveltree[$id]['level'] = 0;
+				//$leveltree[$id]['children'] = array();
+			} else {
+				$currentParent = $levelsflat[$parent_id]['class'];
+				$currentChild = $levelsflat[$id]['class'];
+				$levelsflat[$id]['class']->setParent($currentParent);
+				$levelsflat[$parent_id]['class']->addSubComment($currentChild);
+			}
+		}
+		//reset comment values to nested order
+		$comments = array();
+		foreach($leveltree as $id => $comment) {
+			array_merge($comments, $comment->getContent);
+		}
+		return $comments;
     }
 
     /**
