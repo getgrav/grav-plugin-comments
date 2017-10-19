@@ -1,60 +1,37 @@
 {% if grav.twig.enable_comments_plugin %}
     {% set scope = scope ?: 'data.' %}
 
-    <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
-
-    <form name="{{ grav.config.plugins.comments.form.name }}"
-          action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}"
-          method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
-
-        {% for field in grav.config.plugins.comments.form.fields %}
-            {% set value = form.value(field.name) %}
-            {% if field.evaluateDefault %}
-                {% set value = evaluate(field.evaluateDefault) %}
-            {% endif %}
-            {% if config.plugins.login.enabled and grav.user.authenticated %}
-                {% if field.name == 'name' %}
-                    <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.fullname}}">
-                {% elseif field.name == 'email' %}
-                    <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.email}}">
-                {% else %}
-                    <div>
-                        {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-                    </div>
-                {% endif %}
-            {% else %}
-                <div>
-                    {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-                </div>
-            {% endif %}
-        {% endfor %}
-        {% include "forms/fields/formname/formname.html.twig" %}
-
-        <div class="buttons">
-        {% for button in grav.config.plugins.comments.form.buttons %}
-            <button class="button" type="{{ button.type|default('submit') }}">{{ button.value|t|default('Submit') }}</button>
-        {% endfor %}
-        </div>
-
-        {{ nonce_field('form', 'form-nonce')|raw }}
-    </form>
-
-    <div class="alert">{{ form.message }}</div>
+    {% include 'partials/comments.form.html.twig' %}
 
     {% if grav.twig.comments|length %}
 
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
-
-        <table>
+            <div class="row comments">
             {% for comment in grav.twig.comments|array_reverse %}
-            <tr>
-                <td>
-                    {{comment.text}}
-                    <br />
-                    {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
-                </td>
-            </tr>
+				<div class="media media-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
+				  <div class="media-left">
+					<a href="#">
+					  <img class="media-object" style="width:100px;" src="https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon" alt="user icon">
+					</a>
+				  </div>
+				  <div class="media-body">
+					<h4 class="media-heading">{{comment.title}}</h4>
+					<div class="">
+						<a class="reply-link" href="#">Reply</a>
+					</div>
+					<div class="">
+						{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
+					</div>
+					<div  class="media-text" >
+						{{comment.text}}
+					</div>
+					{{nested}}
+				  </div>
+				</div>
             {% endfor %}
-        </table>
+            </div>
+
     {% endif %}
 {% endif %}
+
+
