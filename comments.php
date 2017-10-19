@@ -1,17 +1,19 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\File\CompiledJsonFile;
+use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Filesystem\Folder;
+use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
 use Grav\Common\GPM\GPM;
 use Grav\Common\Grav;
 use Grav\Common\Page\Page;
 use Grav\Common\Page\Pages;
 use Grav\Common\Plugin;
-use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
 use Grav\Common\User\User;
 use Grav\Common\Utils;
-use RocketTheme\Toolbox\File\File;
 use RocketTheme\Toolbox\Event\Event;
+use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
 
 class CommentsPlugin extends Plugin
@@ -28,30 +30,6 @@ class CommentsPlugin extends Plugin
         return [
             'onPluginsInitialized' => ['onPluginsInitialized', 0]
         ];
-    }
-
-    /**
-     * Initialize form if the page has one. Also catches form processing if user posts the form.
-     *
-     * Used by Form plugin < 2.0, kept for backwards compatibility
-     *
-     * @deprecated
-     */
-    public function onPageInitialized()
-    {
-        /** @var Page $page */
-        $page = $this->grav['page'];
-        if (!$page) {
-            return;
-        }
-
-        if ($this->enable) {
-            $header = $page->header();
-            if (!isset($header->form)) {
-                $header->form = $this->grav['config']->get('plugins.comments.form');
-                $page->header($header);
-            }
-        }
     }
 
     /**
@@ -117,7 +95,6 @@ class CommentsPlugin extends Plugin
             $this->enable([
                 'onFormProcessed' => ['onFormProcessed', 0],
                 'onFormPageHeaderProcessed' => ['onFormPageHeaderProcessed', 0],
-                'onPageInitialized' => ['onPageInitialized', 10],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
             ]);
         }
@@ -208,13 +185,90 @@ class CommentsPlugin extends Plugin
                 $language = $this->grav['language'];
                 $lang = $language->getLanguage();
 
+				/******************************/
+				/** store comments with page **/
+				/******************************/
+				$page = $this->grav['page'];
+				$localfilename = $page->path() . '/comments.yaml';
+				$localfile = CompiledYamlFile::instance($localfilename);
+                if (file_exists($localfilename)) {
+                    $data = $localfile->content();
+					$data['autoincrement']++;
+                    $data['comments'][] = [
+                        'id' => $data['autoincrement'],
+                        'parent' => 0,
+                        'lang' => $lang,
+                        'title' => $title,
+                        'text' => $text,
+                        'date' => date('D, d M Y H:i:s', time()),
+                        'author' => $name,
+                        'email' => $email
+                    ];
+                } else {
+                    $data = array(
+                        'autoincrement' => 1,
+                        'comments' => array([
+							'id' => 1,
+							'parent' => 0,
+							'lang' => $lang,
+							'title' => $title,
+                            'text' => $text,
+                            'date' => date('D, d M Y H:i:s', time()),
+                            'author' => $name,
+                            'email' => $email
+                        ])
+                    );
+                }
+                $localfile->save($data);
+				$localid = $data['autoincrement'];
+				$data = null;
+				/**********************************/
+				/** store comments in index file **/
+				/**********************************/
+				$indexfilename = DATA_DIR . 'comments/index.yaml';
+				$indexfile = CompiledYamlFile::instance($indexfilename);
+                if (file_exists($indexfilename)) {
+                    $data = $indexfile->content();
+                    $data['comments'][] = [
+                        'page' => $page->route(),
+                        'id' => $localid,
+                        'parent' => 0,
+                        'lang' => $lang,
+                        'title' => $title,
+                        'text' => $text,
+                        'date' => date('D, d M Y H:i:s', time()),
+                        'author' => $name,
+                        'email' => $email
+                    ];
+                } else {
+                    $data = array(
+                        'comments' => array([
+							'page' => $page->route(),
+							'id' => $localid,
+							'parent' => 0,
+							'lang' => $lang,
+							'title' => $title,
+                            'text' => $text,
+                            'date' => date('D, d M Y H:i:s', time()),
+                            'author' => $name,
+                            'email' => $email
+                        ])
+                    );
+                }
+                $indexfile->save($data);
+				$data = null;
+				/**************************************/
+				/** store comments in old data files **/
+				/** TODO: remove as soon as admin    **/
+				/**       panel uses new index file  **/
+				/**************************************/
                 $filename = DATA_DIR . 'comments';
                 $filename .= ($lang ? '/' . $lang : '');
                 $filename .= $path . '.yaml';
-                $file = File::instance($filename);
+                $file = CompiledYamlFile::instance($filename);
 
                 if (file_exists($filename)) {
-                    $data = Yaml::parse($file->content());
+                    $data = $file->content();
 
                     $data['comments'][] = [
                         'text' => $text,
@@ -235,7 +289,7 @@ class CommentsPlugin extends Plugin
                     );
                 }
 
-                $file->save(Yaml::dump($data));
+                $file->save($data);
 
                 //clear cache
                 $this->grav['cache']->delete($this->comments_cache_id);
@@ -380,14 +434,16 @@ class CommentsPlugin extends Plugin
     private function getDataFromFilename($fileRoute) {
 
         //Single item details
-        $fileInstance = File::instance(DATA_DIR . 'comments/' . $fileRoute);
+        //$fileInstance = CompiledYamlFile::instance(DATA_DIR . 'comments/' . $fileRoute);
+		//Use comment file in page folder
+		$fileInstance = CompiledYamlFile::instance($this->grav['page']->path() . '/comments.yaml');
 
         if (!$fileInstance->content()) {
             //Item not found
             return;
         }
 
-        return Yaml::parse($fileInstance->content());
+        return $fileInstance->content();
     }
 
     /**
