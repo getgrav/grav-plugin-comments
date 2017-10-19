@@ -8,21 +8,19 @@
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
             <div class="row comments">
             {% for comment in grav.twig.comments|array_reverse %}
-				<div class="media media-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
-				  <div class="media-left">
+				<div class="comment comment-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
+				  <div class="comment-left">
 					<a href="#">
-					  <img class="media-object" style="width:100px;" src="https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon" alt="user icon">
+					  <img class="comment-object" src="https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon" alt="user icon">
 					</a>
 				  </div>
-				  <div class="media-body">
-					<h4 class="media-heading">{{comment.title}}</h4>
-					<div class="">
-						<a class="reply-link" href="#">Reply</a>
+				  <div class="comment-body">
+					<div class="comment-heading">
+						<div class="comment-title"><h4>{{comment.title}}</h4></div>
+						<div class="comment-reply"><a class="reply-link" href="#">Reply</a></div>
+						<div class="comment-meta">{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>
 					</div>
-					<div class="">
-						{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
-					</div>
-					<div  class="media-text" >
+					<div class="comment-text" >
 						{{comment.text}}
 					</div>
 					{{nested}}
