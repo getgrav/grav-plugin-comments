@@ -16,7 +16,8 @@ use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
 
-require_once 'class\Comment.php';
+require_once '/html/apps/grav/user/plugins/comments/class/Comment.php';
+use Grav\Plugin\Comment;
 
 class CommentsPlugin extends Plugin
 {
@@ -404,7 +405,7 @@ class CommentsPlugin extends Plugin
         $filename .= $this->grav['uri']->path() . '.yaml';
 
         $comments = $this->getDataFromFilename($filename)['comments'];
-		$comments = setCommentLevels($comments);
+		$comments = $this->setCommentLevels($comments);
         //save to cache if enabled
         $cache->save($this->comments_cache_id, $comments);
         return $comments;
@@ -414,11 +415,8 @@ class CommentsPlugin extends Plugin
      * Return the latest commented pages
      */
     private function setCommentLevels($comments) {
-		$levels = array();
 		$levelsflat = array();
 		foreach($comments as $key => $comment) {
-			//$comments[$key]['level'] = 0;
-			$levels[$comment['parent']][] = $comment['id'];
 			$levelsflat[$comment['id']]['parent'] = $comment['parent'];
 			$levelsflat[$comment['id']]['class'] = new Comment($comment['id'], $comments[$key]);
 		}
@@ -426,11 +424,8 @@ class CommentsPlugin extends Plugin
 		$leveltree = array();
 		foreach($levelsflat as $id => $parent) {
 			$parent_id = $parent['parent'];
-			if(!isset($levelsflat[$parent_id]){
+			if(!isset($levelsflat[$parent_id])){
 				$leveltree[$id] = $levelsflat[$id]['class'];
-				//$leveltree[$id] = array();
-				//$leveltree[$id]['level'] = 0;
-				//$leveltree[$id]['children'] = array();
 			} else {
 				$currentParent = $levelsflat[$parent_id]['class'];
 				$currentChild = $levelsflat[$id]['class'];
@@ -441,7 +436,7 @@ class CommentsPlugin extends Plugin
 		//reset comment values to nested order
 		$comments = array();
 		foreach($leveltree as $id => $comment) {
-			array_merge($comments, $comment->getContent);
+			$comments = array_merge($comments, $comment->getContent());
 		}
 		return $comments;
     }

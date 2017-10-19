@@ -1,5 +1,7 @@
 <?php
 
+namespace Grav\Plugin;
+
 class Comment 
 {
     private $id = 0;
@@ -22,11 +24,11 @@ class Comment
     }
 
     public function getContent($level = 0) {
-		$comments = $this->value;
-		$comments['level'] = $level;
+		$this->value['level'] = $level;
+		$comments[] = $this->value;
 		
 		foreach($this->children as $child) {
-			array_merge($comments, $child->getContent($level + 1));
+			$comments[] = $child->getContent($level + 1);
 		}
 		return $comments;
     }
