@@ -96,6 +96,7 @@ class CommentsPlugin extends Plugin
 
         if ($this->enable) {
             $this->enable([
+                'onPageInitialized' => ['onPageInitialized', 0],
                 'onFormProcessed' => ['onFormProcessed', 0],
                 'onFormPageHeaderProcessed' => ['onFormPageHeaderProcessed', 0],
                 'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
@@ -149,6 +150,31 @@ class CommentsPlugin extends Plugin
             $this->initializeFrontend();
         }
     }
+
+    /**
+     * Handle ajax call.
+     */
+    public function onPageInitialized()
+    {
+        // initialize with page settings (post-cache)
+//        if (!$this->isAdmin() && isset($this->grav['page']->header()->{'star-ratings'})) {
+//			// if not in admin merge potential page-level configs
+//            $this->config->set('plugins.star-ratings', $this->mergeConfig($page));
+//        }
+        $this->callback = 'nested-comments';
+//        $this->callback = $this->config->get('plugins.star-ratings.callback');
+//        $this->total_stars = $this->config->get('plugins.star-ratings.total_stars');
+//        $this->only_full_stars = $this->config->get('plugins.star-ratings.only_full_stars');
+
+        // Process vote if required
+        if ($this->callback === $this->grav['uri']->path()) {
+            // try to add the vote
+            $result = $this->addVote();
+            echo json_encode(['status' => $result[0], 'message' => $result[1], 'data' => ['score' => $result[2][0], 'count' => $result[2][1]]]);
+            exit();
+        }
+    }
+
 
     /**
      * Handle form processing instructions.
