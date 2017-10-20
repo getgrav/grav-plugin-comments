@@ -1,5 +1,5 @@
     <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
-    <form name="{{ grav.config.plugins.comments.form.name }}"
+    <form name="{{ grav.config.plugins.comments.form.name }}" class="comments-form"
           action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}"
           method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
 

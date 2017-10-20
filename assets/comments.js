@@ -11,7 +11,7 @@ $(document).ready(function () {
     }
 
     PhpComment.prototype.setupVariables = function () {
-        this.commentForm = this.element.find(".comment-form");
+        this.commentForm = this.element.find(".comments-form");
         this.titleField = this.element.find("#comment_title");
         this.bodyField = this.element.find("#comment_body");
     }
@@ -35,8 +35,8 @@ $(document).ready(function () {
                 title = phpComment.titleField.val(),
                 body = phpComment.bodyField.val();
 
-            if(phpComment.commentForm.parents(".media").length > 0){
-                parentId = phpComment.commentForm.closest(".media").attr("data-Id");
+            if(phpComment.commentForm.parents(".comment").length > 0){
+                parentId = phpComment.commentForm.closest(".comment").attr("data-Id");
             }
 
             $.ajax({
@@ -63,8 +63,7 @@ $(document).ready(function () {
 
         $(document).on("click", ".comment-add-new", function (e) {
             e.preventDefault();
-            var media = $(this).closest(".comments");
-            media.find(">.comment-body>.comment-text").after(phpComment.commentForm);
+            $(this).find(".comments").before(phpComment.commentForm);
         });
         $(document).on("click", ".comment-add-reply", function (e) {
             e.preventDefault();

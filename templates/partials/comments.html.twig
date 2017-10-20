@@ -6,6 +6,7 @@
     {% if grav.twig.comments|length %}
 
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
+		<a class="comment-add-new" href="#">{{'PLUGIN_COMMENTS.ADD_NEW'|t}}</a>
             <div class="row comments">
             {% for comment in grav.twig.comments|array_reverse %}
 				<div class="comment comment-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
@@ -17,7 +18,7 @@
 				  <div class="comment-body">
 					<div class="comment-heading">
 						<div class="comment-title"><h4>{{comment.title}}</h4></div>
-						<div class="comment-reply"><a class="reply-link" href="#">Reply</a></div>
+						<div class="comment-reply"><a class="comment-add-reply" href="#">{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a></div>
 						<div class="comment-meta">{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>
 					</div>
 					<div class="comment-text" >

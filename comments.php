@@ -56,6 +56,13 @@ class CommentsPlugin extends Plugin
     public function onTwigSiteVariables() {
         $this->grav['twig']->enable_comments_plugin = $this->enable;
         $this->grav['twig']->comments = $this->fetchComments();
+        if ($this->config->get('plugins.comments.built_in_css')) {
+            $this->grav['assets']
+                ->addCss('plugin://comments/assets/comments.css');
+        }
+        $this->grav['assets']
+            ->add('jquery', 101)
+            ->addJs('plugin://comments/assets/comments.js');
     }
 
     /**
@@ -166,13 +173,50 @@ class CommentsPlugin extends Plugin
 //        $this->total_stars = $this->config->get('plugins.star-ratings.total_stars');
 //        $this->only_full_stars = $this->config->get('plugins.star-ratings.only_full_stars');
 
-        // Process vote if required
+        // Process comment if required
         if ($this->callback === $this->grav['uri']->path()) {
-            // try to add the vote
-            $result = $this->addVote();
+            // try to add the comment
+            $result = $this->addComment();
             echo json_encode(['status' => $result[0], 'message' => $result[1], 'data' => ['score' => $result[2][0], 'count' => $result[2][1]]]);
             exit();
         }
+    }
+
+    public function addComment()
+    {
+        $nonce = $this->grav['uri']->param('nonce');
+        if (!Utils::verifyNonce($nonce, 'comments')) {
+            return [false, 'Invalid security nonce', [0, 0]];
+        }
+        $language = $this->grav['language'];
+        // get and filter the data
+		$parent_id = filter_input(INPUT_POST, 'parent_id', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $email          = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_STRING);
+        $text          = filter_input(INPUT_POST, 'text', FILTER_SANITIZE_STRING);
+        $title          = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
+        $name          = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+        //$data = $this->getStars($id);
+		$data = array(
+			['parent_id'] => $parent_id,
+			['email'] => $email,
+			['text'] => $text,
+			['title'] => $title,
+			['name'] => $name,
+		);
+        // ensure both values are sent
+        if (is_null($title) || is_null($text)) {
+            return [false, 'missing either text or title', [0, 0]];
+			//return [false, $language->translate('PLUGIN_COMMENTS.FAIL'), $data];
+        }
+        // sanity checks for parents
+        if ($parent_id < 0) {
+            $parent_id = 0;
+        } elseif ($parent_id > 999 ) { //TODO: Change to 'exists in list of comment ids
+            $parent_id = 0;
+        }
+        //$this->saveVoteData($id, $rating);
+        //$data = $this->getStars($id);
+        return [true, $language->translate('PLUGIN_COMMENTS.SUCCESS'), $data];
     }
 
 
