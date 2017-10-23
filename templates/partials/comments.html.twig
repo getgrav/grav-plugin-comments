@@ -8,7 +8,7 @@
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
 		<a class="comment-add-new" href="#">{{'PLUGIN_COMMENTS.ADD_NEW'|t}}</a>
             <div class="row comments">
-            {% for comment in grav.twig.comments|array_reverse %}
+            {% for comment in grav.twig.comments %}
 				<div class="comment comment-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
 				  <div class="comment-left">
 					<a href="#">
