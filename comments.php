@@ -73,9 +73,15 @@ class CommentsPlugin extends Plugin
 
         $disable_on_routes = (array) $this->config->get('plugins.comments.disable_on_routes');
         $enable_on_routes = (array) $this->config->get('plugins.comments.enable_on_routes');
+        $callback = $this->config->get('plugins.comments.ajax_callback');
 
         $path = $uri->path();
 
+        if ($callback === $path) {
+			$this->enable = true;
+			return;
+		}
+		
         if (!in_array($path, $disable_on_routes)) {
             if (in_array($path, $enable_on_routes)) {
                 $this->enable = true;
@@ -163,58 +169,126 @@ class CommentsPlugin extends Plugin
      */
     public function onPageInitialized()
     {
+		$is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
         // initialize with page settings (post-cache)
 //        if (!$this->isAdmin() && isset($this->grav['page']->header()->{'star-ratings'})) {
 //			// if not in admin merge potential page-level configs
 //            $this->config->set('plugins.star-ratings', $this->mergeConfig($page));
 //        }
-        $this->callback = 'nested-comments';
 //        $this->callback = $this->config->get('plugins.star-ratings.callback');
 //        $this->total_stars = $this->config->get('plugins.star-ratings.total_stars');
 //        $this->only_full_stars = $this->config->get('plugins.star-ratings.only_full_stars');
-
+        $callback = $this->config->get('plugins.comments.ajax_callback');
         // Process comment if required
-        if ($this->callback === $this->grav['uri']->path()) {
+        if ($is_ajax || $callback === $this->grav['uri']->path()) {
             // try to add the comment
             $result = $this->addComment();
-            echo json_encode(['status' => $result[0], 'message' => $result[1], 'data' => ['score' => $result[2][0], 'count' => $result[2][1]]]);
-            exit();
+            echo json_encode([
+				'status' => $result[0],
+				'message' => $result[1],
+				'data' => $result[2],
+//				'data' => [
+//					'score' => $result[2][0],
+//					'count' => $result[2][1]
+//				]
+			]);
+            exit(); //prevents the page frontend from beeing displayed.
         }
     }
 
     public function addComment()
     {
-        $nonce = $this->grav['uri']->param('nonce');
-        if (!Utils::verifyNonce($nonce, 'comments')) {
-            return [false, 'Invalid security nonce', [0, 0]];
-        }
-        $language = $this->grav['language'];
+        if (!$_SERVER["REQUEST_METHOD"] == "POST") {
+			// Not a POST request, set a 403 (forbidden) response code.
+			http_response_code(403);
+			return [false, 'There was a problem with your submission, please try again.', [0, 0]];
+		}
         // get and filter the data
-		$parent_id = filter_input(INPUT_POST, 'parent_id', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $email          = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_STRING);
-        $text          = filter_input(INPUT_POST, 'text', FILTER_SANITIZE_STRING);
-        $title          = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
-        $name          = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-        //$data = $this->getStars($id);
-		$data = array(
-			['parent_id'] => $parent_id,
-			['email'] => $email,
-			['text'] => $text,
-			['title'] => $title,
-			['name'] => $name,
-		);
+        if (!isset($_POST['data']) || !is_array($_POST['data'])) {
+            // Set a 400 (bad request) response code and exit.
+            http_response_code(400);
+            return [false, 'missing data', [0, 0]];
+        }
+		$input = array();
+		$input['parent_id']		= filter_input(INPUT_POST, 'parentID', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+		$input['name']			= isset($_POST['data']['name']) ? filter_var($_POST['data']['name'], FILTER_SANITIZE_STRING) : null;
+		$input['email']			= isset($_POST['data']['email']) ? filter_var($_POST['data']['email'], FILTER_SANITIZE_EMAIL) : null;
+		$input['text']			= isset($_POST['data']['text']) ? filter_var($_POST['data']['text'], FILTER_SANITIZE_STRING) : null;
+		$input['date']			= isset($_POST['data']['date']) ? filter_var($_POST['data']['date'], FILTER_SANITIZE_STRING) : null;
+		$input['title']			= isset($_POST['data']['title']) ? filter_var($_POST['data']['title'], FILTER_SANITIZE_STRING) : null;
+		$input['lang']			= isset($_POST['data']['lang']) ? filter_var($_POST['data']['lang'], FILTER_SANITIZE_STRING) : null;
+		$input['path']			= isset($_POST['data']['path']) ? filter_var($_POST['data']['path'], FILTER_SANITIZE_STRING) : null;
+		$input['form-name']		= filter_input(INPUT_POST, 'form-name', FILTER_SANITIZE_STRING);
+		$input['form-nonce']	= filter_input(INPUT_POST, 'form-nonce', FILTER_SANITIZE_STRING);
+/*
+		foreach ($_POST['data'] as $field) {
+			if (isset($field['name']) && isset($field['value'])) {
+				switch ($field['name']) {
+					case 'data[name]':
+						$input['name'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'data[email]':
+						$input['email'] = filter_var($field['value'], FILTER_SANITIZE_EMAIL);
+						break;
+					case 'data[text]':
+						$input['text'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'data[date]':
+						$input['date'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'data[title]':
+						$input['title'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'data[lang]':
+						$input['lang'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'data[path]':
+						$input['path'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case '__form-name__':
+						$input['form-name'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
+						break;
+					case 'form-nonce':
+						$input['form-nonce'] = filter_var($field['value'], FILTER_SANITIZE_STRING); //$this->grav['uri']->param('nonce');
+						break;
+					default:
+					   //ignore unexpected fields.
+				}
+			}
+		}
+*/
+        if (!Utils::verifyNonce($input['form-nonce'], 'comments')) {
+			http_response_code(403);
+            return [false, 'Invalid security nonce', [$_POST, $input['form-nonce']]];
+        }
         // ensure both values are sent
-        if (is_null($title) || is_null($text)) {
+        if (is_null($input['title']) || is_null($input['text'])) {
+            // Set a 400 (bad request) response code and exit.
+            http_response_code(400);
             return [false, 'missing either text or title', [0, 0]];
 			//return [false, $language->translate('PLUGIN_COMMENTS.FAIL'), $data];
         }
+        $language = $this->grav['language'];
+        //$data = $this->getStars($id);
+		$data = array(
+			'parent_id' => $input['parent_id'],
+			'email' => $input['email'],
+			'text' => $input['text'],
+			'title' => $input['title'],
+			'name' => $input['name'],
+			'id' => 99,
+			'level' => 0,
+			'hash' => md5(strtolower(trim($input['email']))),
+		);
         // sanity checks for parents
-        if ($parent_id < 0) {
-            $parent_id = 0;
-        } elseif ($parent_id > 999 ) { //TODO: Change to 'exists in list of comment ids
-            $parent_id = 0;
+        if ($data['parent_id'] < 0) {
+            $data['parent_id'] = 0;
+        } elseif ($data['parent_id'] > 999 ) { //TODO: Change to 'exists in list of comment ids
+            $data['parent_id'] = 0;
         }
         //$this->saveVoteData($id, $rating);
+            // Set a 500 (internal server error) response code.
+//            http_response_code(500);
         //$data = $this->getStars($id);
         return [true, $language->translate('PLUGIN_COMMENTS.SUCCESS'), $data];
     }
@@ -485,6 +559,9 @@ class CommentsPlugin extends Plugin
      * Return the latest commented pages
      */
     private function setCommentLevels($comments) {
+		if(!is_array($comments)) {
+			return $comments;
+		}
 		$levelsflat = array();
 		foreach($comments as $key => $comment) {
 			$levelsflat[$comment['id']]['parent'] = $comment['parent'];
