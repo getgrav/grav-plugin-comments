@@ -32,7 +32,7 @@
         {% endfor %}
         </div>
 
-        {{ nonce_field('form', 'form-nonce')|raw }}
+        {{ nonce_field('comments', 'form-nonce')|raw }}
     </form>
 
     <div class="alert">{{ form.message }}</div>
