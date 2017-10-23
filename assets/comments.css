@@ -1,0 +1,68 @@
+/*
+===============================================================================================================================
+Comments Plugin Styles
+===============================================================================================================================
+*/
+
+.comment {
+	margin-top: 15px;
+	border-top: gray solid 2px;
+}
+.comment:first-child {
+  margin-top: 0;
+}
+.comment,
+.comment-body {
+  zoom: 1;
+  overflow: hidden;
+}
+.comment-body {
+  width: 10000px;
+}
+.comment-object {
+  display: block;
+}
+.comment-right,
+.comment > .pull-right {
+  padding-left: 10px;
+}
+.comment-left,
+.comment > .pull-left {
+  padding-right: 10px;
+}
+.comment-left,
+.comment-right,
+.comment-body {
+  display: table-cell;
+  vertical-align: top;
+}
+.comment-middle {
+  vertical-align: middle;
+}
+.comment-bottom {
+  vertical-align: bottom;
+}
+.comment-heading {
+  margin-top: 0;
+  margin-bottom: 5px;
+  border-bottom: gray dashed 1px;
+}
+.comment-title, .comment-title h4 {
+	padding: 0px;
+	margin: 0px;
+}
+.comment-meta {
+	display: inline;
+	font-size: small;
+}
+.comment-reply {
+	display: inline;
+	float: right;
+}
+.comment-text {
+	clear: both;
+}
+.comment-list {
+  padding-left: 0;
+  list-style: none;
+}

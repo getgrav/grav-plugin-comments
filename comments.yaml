@@ -1,13 +1,12 @@
 enabled: true
-
+built_in_css: true
+ajax_callback: /nested-comments
 enable_on_routes:
   - '/blog'
-
 disable_on_routes:
   - /blog/blog-post-to-ignore
   - /ignore-this-route
   #- '/blog/daring-fireball-link'
-
 form:
     name: comments
     fields:
