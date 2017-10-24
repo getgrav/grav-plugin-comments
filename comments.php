@@ -182,7 +182,7 @@ class CommentsPlugin extends Plugin
         // Process comment if required
         if ($is_ajax || $callback === $this->grav['uri']->path()) {
             // try to add the comment
-            $result = $this->addComment();
+            $result = $this->addComment(true);
             echo json_encode([
 				'status' => $result[0],
 				'message' => $result[1],
@@ -196,8 +196,10 @@ class CommentsPlugin extends Plugin
         }
     }
 
-    public function addComment()
+    public function addComment($is_ajax = false)
     {
+	if($is_ajax) {
+        $language = $this->grav['language'];
         if (!$_SERVER["REQUEST_METHOD"] == "POST") {
 			// Not a POST request, set a 403 (forbidden) response code.
 			http_response_code(403);
@@ -220,43 +222,6 @@ class CommentsPlugin extends Plugin
 		$input['path']			= isset($_POST['data']['path']) ? filter_var($_POST['data']['path'], FILTER_SANITIZE_STRING) : null;
 		$input['form-name']		= filter_input(INPUT_POST, 'form-name', FILTER_SANITIZE_STRING);
 		$input['form-nonce']	= filter_input(INPUT_POST, 'form-nonce', FILTER_SANITIZE_STRING);
-/*
-		foreach ($_POST['data'] as $field) {
-			if (isset($field['name']) && isset($field['value'])) {
-				switch ($field['name']) {
-					case 'data[name]':
-						$input['name'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'data[email]':
-						$input['email'] = filter_var($field['value'], FILTER_SANITIZE_EMAIL);
-						break;
-					case 'data[text]':
-						$input['text'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'data[date]':
-						$input['date'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'data[title]':
-						$input['title'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'data[lang]':
-						$input['lang'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'data[path]':
-						$input['path'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case '__form-name__':
-						$input['form-name'] = filter_var($field['value'], FILTER_SANITIZE_STRING);
-						break;
-					case 'form-nonce':
-						$input['form-nonce'] = filter_var($field['value'], FILTER_SANITIZE_STRING); //$this->grav['uri']->param('nonce');
-						break;
-					default:
-					   //ignore unexpected fields.
-				}
-			}
-		}
-*/
         if (!Utils::verifyNonce($input['form-nonce'], 'comments')) {
 			http_response_code(403);
             return [false, 'Invalid security nonce', [$_POST, $input['form-nonce']]];
@@ -268,31 +233,138 @@ class CommentsPlugin extends Plugin
             return [false, 'missing either text or title', [0, 0]];
 			//return [false, $language->translate('PLUGIN_COMMENTS.FAIL'), $data];
         }
-        $language = $this->grav['language'];
-        //$data = $this->getStars($id);
-		$data = array(
-			'parent_id' => $input['parent_id'],
-			'email' => $input['email'],
-			'text' => $input['text'],
-			'title' => $input['title'],
-			'name' => $input['name'],
-			'id' => 99,
-			'level' => 0,
-			'hash' => md5(strtolower(trim($input['email']))),
-		);
         // sanity checks for parents
-        if ($data['parent_id'] < 0) {
-            $data['parent_id'] = 0;
-        } elseif ($data['parent_id'] > 999 ) { //TODO: Change to 'exists in list of comment ids
-            $data['parent_id'] = 0;
+        if ($input['parent_id'] < 0) {
+            $input['parent_id'] = 0;
+        } elseif ($input['parent_id'] > 999 ) { //TODO: Change to 'exists in list of comment ids
+            $input['parent_id'] = 0;
         }
-        //$this->saveVoteData($id, $rating);
-            // Set a 500 (internal server error) response code.
-//            http_response_code(500);
-        //$data = $this->getStars($id);
+		$lang = $this->grav['language']->getLanguage();
+		$path = $this->grav['page']->path();
+		$route = $this->grav['page']->route();
+        $comment = $this->saveComment($route, $path, $input['parent_id'], $lang, $input['text'], $input['name'], $input['email'], $input['title']);
+        //$comments = $this->fetchComments();
+		$data = array(
+			'parent_id' => $comment['parent'],
+			'id' => $comment['id'],
+			'text' => $comment['text'],
+			'title' => $comment['title'],
+			'name' => $comment['author'],
+			'date' => $comment['date'],
+			'level' => 0,
+			'hash' => md5(strtolower(trim($comment['email']))),
+			'ADD_REPLY' => $language->translate('PLUGIN_COMMENTS.ADD_REPLY'),
+			'WRITTEN_ON' => $language->translate('PLUGIN_COMMENTS.WRITTEN_ON'),
+			'BY' => $language->translate('PLUGIN_COMMENTS.BY'),
+		);
         return [true, $language->translate('PLUGIN_COMMENTS.SUCCESS'), $data];
+	} else {
+// Set a 500 (internal server error) response code.
+// http_response_code(500);
+		
+	}
     }
 
+    /**
+     * Handle form processing instructions.
+     *
+     * @param Event $event
+     */
+    public function saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title)
+    {
+				$date = date('D, d M Y H:i:s', time());
+				
+				/******************************/
+				/** store comments with page **/
+				/******************************/
+				$localfilename = $path . '/comments.yaml';
+				$localfile = CompiledYamlFile::instance($localfilename);
+                if (file_exists($localfilename)) {
+                    $data = $localfile->content();
+					$data['autoincrement']++;
+                } else {
+                    $data = array(
+                        'autoincrement' => 1,
+                        'comments' => array()
+                    );
+                }
+				$localid = $data['autoincrement'];
+				$newComment = [
+					'id' => $data['autoincrement'],
+					'parent' => $parent_id,
+					'lang' => $lang,
+					'title' => $title,
+					'text' => $text,
+					'date' => $date,
+					'author' => $name,
+					'email' => $email
+				];
+				$data['comments'][] = $newComment;
+                $localfile->save($data);
+				/**********************************/
+				/** store comments in index file **/
+				/**********************************/
+				$indexfilename = DATA_DIR . 'comments/index.yaml';
+				$indexfile = CompiledYamlFile::instance($indexfilename);
+                if (file_exists($indexfilename)) {
+                    $dataIndex = $indexfile->content();
+                } else {
+                    $dataIndex = array(
+                        'comments' => array()
+                    );
+                }
+				$dataIndex['comments'][] = [
+					'page' => $route,
+					'id' => $localid,
+					'parent' => $parent_id,
+					'lang' => $lang,
+					'title' => $title,
+					'text' => $text,
+					'date' => $date,
+					'author' => $name,
+					'email' => $email
+				];
+                $indexfile->save($dataIndex);
+
+				/**************************************/
+				/** store comments in old data files **/
+				/** TODO: remove as soon as admin    **/
+				/**       panel uses new index file  **/
+				/**************************************/
+                $filename = DATA_DIR . 'comments';
+                $filename .= ($lang ? '/' . $lang : '');
+                $filename .= $path . '.yaml';
+                $file = CompiledYamlFile::instance($filename);
+
+                if (file_exists($filename)) {
+                    $dataLegacy = $file->content();
+
+                    $dataLegacy['comments'][] = [
+                        'text' => $text,
+                        'date' => $date,
+                        'author' => $name,
+                        'email' => $email
+                    ];
+                } else {
+                    $dataLegacy = array(
+                        'title' => $title,
+                        'lang' => $lang,
+                        'comments' => array([
+                            'text' => $text,
+                            'date' => $date,
+                            'author' => $name,
+                            'email' => $email
+                        ])
+                    );
+                }
+
+                $file->save($dataLegacy);
+
+                //clear cache
+                $this->grav['cache']->delete($this->comments_cache_id);
+				
+				return $newComment;
+    }
 
     /**
      * Handle form processing instructions.
@@ -319,6 +391,7 @@ class CommentsPlugin extends Plugin
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
                 $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+				$parent_id = 0;
 
                 if (isset($this->grav['user'])) {
                     $user = $this->grav['user'];
@@ -329,117 +402,12 @@ class CommentsPlugin extends Plugin
                 }
 
                 /** @var Language $language */
-                $language = $this->grav['language'];
-                $lang = $language->getLanguage();
+                $lang = $this->grav['language']->getLanguage();
+				
+				$path = $this->grav['page']->path();
+				$route = $this->grav['page']->route();
 
-				/******************************/
-				/** store comments with page **/
-				/******************************/
-				$page = $this->grav['page'];
-				$localfilename = $page->path() . '/comments.yaml';
-				$localfile = CompiledYamlFile::instance($localfilename);
-                if (file_exists($localfilename)) {
-                    $data = $localfile->content();
-					$data['autoincrement']++;
-                    $data['comments'][] = [
-                        'id' => $data['autoincrement'],
-                        'parent' => 0,
-                        'lang' => $lang,
-                        'title' => $title,
-                        'text' => $text,
-                        'date' => date('D, d M Y H:i:s', time()),
-                        'author' => $name,
-                        'email' => $email
-                    ];
-                } else {
-                    $data = array(
-                        'autoincrement' => 1,
-                        'comments' => array([
-							'id' => 1,
-							'parent' => 0,
-							'lang' => $lang,
-							'title' => $title,
-                            'text' => $text,
-                            'date' => date('D, d M Y H:i:s', time()),
-                            'author' => $name,
-                            'email' => $email
-                        ])
-                    );
-                }
-                $localfile->save($data);
-				$localid = $data['autoincrement'];
-				$data = null;
-				/**********************************/
-				/** store comments in index file **/
-				/**********************************/
-				$indexfilename = DATA_DIR . 'comments/index.yaml';
-				$indexfile = CompiledYamlFile::instance($indexfilename);
-                if (file_exists($indexfilename)) {
-                    $data = $indexfile->content();
-                    $data['comments'][] = [
-                        'page' => $page->route(),
-                        'id' => $localid,
-                        'parent' => 0,
-                        'lang' => $lang,
-                        'title' => $title,
-                        'text' => $text,
-                        'date' => date('D, d M Y H:i:s', time()),
-                        'author' => $name,
-                        'email' => $email
-                    ];
-                } else {
-                    $data = array(
-                        'comments' => array([
-							'page' => $page->route(),
-							'id' => $localid,
-							'parent' => 0,
-							'lang' => $lang,
-							'title' => $title,
-                            'text' => $text,
-                            'date' => date('D, d M Y H:i:s', time()),
-                            'author' => $name,
-                            'email' => $email
-                        ])
-                    );
-                }
-                $indexfile->save($data);
-				$data = null;
-				/**************************************/
-				/** store comments in old data files **/
-				/** TODO: remove as soon as admin    **/
-				/**       panel uses new index file  **/
-				/**************************************/
-                $filename = DATA_DIR . 'comments';
-                $filename .= ($lang ? '/' . $lang : '');
-                $filename .= $path . '.yaml';
-                $file = CompiledYamlFile::instance($filename);
-
-                if (file_exists($filename)) {
-                    $data = $file->content();
-
-                    $data['comments'][] = [
-                        'text' => $text,
-                        'date' => date('D, d M Y H:i:s', time()),
-                        'author' => $name,
-                        'email' => $email
-                    ];
-                } else {
-                    $data = array(
-                        'title' => $title,
-                        'lang' => $lang,
-                        'comments' => array([
-                            'text' => $text,
-                            'date' => date('D, d M Y H:i:s', time()),
-                            'author' => $name,
-                            'email' => $email
-                        ])
-                    );
-                }
-
-                $file->save($data);
-
-                //clear cache
-                $this->grav['cache']->delete($this->comments_cache_id);
+                $this->saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title);
 
                 break;
         }
@@ -580,6 +548,9 @@ class CommentsPlugin extends Plugin
 				$levelsflat[$parent_id]['class']->addSubComment($currentChild);
 			}
 		}
+		//youngest comments first (DESC date), only root comments. Keep replies in ASC date order.
+		//as long as comments are not editable, it is sufficient to reverse order from comment file
+		$leveltree = array_reverse($leveltree, true);
 		//reset comment values to nested order
 		$comments = array();
 		foreach($leveltree as $id => $comment) {

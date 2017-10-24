@@ -6,10 +6,10 @@
     {% if grav.twig.comments|length %}
 
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
-		<a class="comment-add-new" href="#">{{'PLUGIN_COMMENTS.ADD_NEW'|t}}</a>
+		<a class="comment-add-new" href="#"><i class="fa fa-plus" title="{{'PLUGIN_COMMENTS.ADD_NEW'|t}}"></i> {{'PLUGIN_COMMENTS.ADD_NEW'|t}}</a>
             <div class="row comments">
             {% for comment in grav.twig.comments %}
-				<div class="comment comment-level-{{comment.level|e}}" data-Id="{{comment.id}}" >
+				<div class="comment comment-level-{{comment.level|e}}" data-level="{{comment.level}}" data-id="{{comment.id}}" >
 				  <div class="comment-left">
 					<a href="#">
 					  <img class="comment-object" src="https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon" alt="user icon">
@@ -18,7 +18,12 @@
 				  <div class="comment-body">
 					<div class="comment-heading">
 						<div class="comment-title"><h4>{{comment.title}}</h4></div>
-						<div class="comment-reply"><a class="comment-add-reply" href="#">{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a></div>
+						<div class="comment-reply">
+							<a class="comment-add-reply" href="#"><i class="fa fa-reply" title="{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}"></i> {{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a>
+							{% if grav.user.access.admin.super %}
+							<a class="comment-delete" href="#"><i class="fa fa-trash" title="{{'PLUGIN_COMMENTS.DELETE'|t}}"></i> {{'PLUGIN_COMMENTS.DELETE'|t}}</a>
+							{% endif %}
+						</div>
 						<div class="comment-meta">{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>
 					</div>
 					<div class="comment-text" >

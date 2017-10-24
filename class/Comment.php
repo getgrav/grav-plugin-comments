@@ -28,7 +28,8 @@ class Comment
 		$comments[] = $this->value;
 		
 		foreach($this->children as $child) {
-			$comments[] = $child->getContent($level + 1);
+			//$comments[] = $child->getContent($level + 1); //produces nested result array.
+			$comments = array_merge($comments, $child->getContent($level + 1)); //produces flat result array.
 		}
 		return $comments;
     }

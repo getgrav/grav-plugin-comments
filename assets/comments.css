@@ -9,7 +9,7 @@ Comments Plugin Styles
 	border-top: gray solid 2px;
 }
 .comment:first-child {
-  margin-top: 0;
+  margin-top: 0px;
 }
 .comment,
 .comment-body {
@@ -43,7 +43,7 @@ Comments Plugin Styles
   vertical-align: bottom;
 }
 .comment-heading {
-  margin-top: 0;
+  margin-top: 0px;
   margin-bottom: 5px;
   border-bottom: gray dashed 1px;
 }
@@ -63,6 +63,55 @@ Comments Plugin Styles
 	clear: both;
 }
 .comment-list {
-  padding-left: 0;
+  padding-left: 0px;
   list-style: none;
+}
+.comment-flag-new {
+	background-color: lightcyan;
+}
+.comment-level-1 { margin-left: 20px; padding-left: 0px; border-left: gray solid 0px; }
+.comment-level-2 { margin-left: 40px; padding-left: 0px; border-left: gray solid 0px; }
+.comment-level-3 { margin-left: 60px; padding-left: 0px; border-left: gray solid 0px; }
+.comment-level-4 { margin-left: 80px; padding-left: 0px; border-left: gray solid 0px; }
+.comment-level-5 { margin-left: 100px; padding-left: 0px; border-left: gray solid 0px; }
+.row.comments { position: relative; }
+.comment-level-1::before {
+    content: "\f105";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 0px;
+    font-size: 3rem;
+    color: lightgray;
+}
+.comment-level-2::before {
+    content: "\f105\f105";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 0px;
+    font-size: 3rem;
+    color: lightgray;
+}
+.comment-level-3::before {
+    content: "\f105\f105\f105";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 0px;
+    font-size: 3rem;
+    color: lightgray;
+}
+.comment-level-4::before {
+    content: "\f105\f105\f105\f105";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 0px;
+    font-size: 3rem;
+    color: lightgray;
+}
+.comment-level-5::before {
+    content: "\f105\f105\f105\f105\f105";
+    font-family: FontAwesome;
+    position: absolute;
+    left: 0px;
+    font-size: 3rem;
+    color: lightgray;
 }

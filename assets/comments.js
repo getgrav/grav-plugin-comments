@@ -1,36 +1,24 @@
+function escapeRegExp(str) {
+    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
 jQuery(document).ready(function () {
   var commentForm = $(document).find('.comments-form');
   var commentSection = $(document).find('.comments').first();
-  var commentAlert = commentForm.closest('.alert');
-  //var newMedia;
+  var commentAlert = $(document).find('.alert').first();
+  
   //hide form, show link
   commentForm.hide();
   $(document).find('.comment-add-new').show();
-  //get template for inserting new comments
-  /* 
-$.ajax({
-	url: '/media_template.php',
-	method: 'GET',
-	dataType: 'html',
-	success: function (data) {
-		newMedia = data;
-	}
-});
- */
-  $('body').on('click', '.comment-add-new-sadf', function (e) {
-    e.preventDefault();
-    alert('asdf');
-    $('span').stop().css('opacity', 1).text('myName = ' + e.name).fadeIn(30).fadeOut(1000);
-  });
+  
   //show comment form above comments section (new comment thread)
   $('body').on('click', '.comment-add-new', function (e) {
     e.preventDefault();
     //commentForm.hide(1000);
-    //commentSection.before(commentForm);
     $(this).before(commentForm);
     commentForm.show('slow');
-    //$(this).slideUp();
+    commentAlert.slideUp();
   });
+  
   //show comment form below selected comment (reply to existing comment)
   $('body').on('click', '.comment-add-reply', function (e) {
     e.preventDefault();
@@ -38,93 +26,96 @@ $.ajax({
     commentForm.hide();
     media.find('>.comment-body>.comment-text').after(commentForm);
     commentForm.show('slow');
+    commentAlert.slideUp();
   });
+  
   // Attach a submit handler to the form
   $(commentForm).on('submit', function (event) {
     event.preventDefault();
-    // Get some values from elements on the page:
-    //var term = $(this).find( "input[name='s']" ).val();
-    //var data = $(this).serializeArray();
+    // Get form data:
     var data = $(this).serialize();
-		console.log("Form Data (submit)", JSON.parse(JSON.stringify(data)));
-    //var url = $(this).attr( "action" );
-    var url = '/nested-comments';
+//console.log("Form Data (submit)", JSON.parse(JSON.stringify(data)));
+    var url = $(this).attr( "action" );
+    //var url = '/nested-comments';
     var parentId = 0;
+    var ownLevel = 0;
     if ($(this).parents('.comment').length > 0) {
-      parentId = $(this).closest('.comment').attr('data-Id');
+      parentId = $(this).closest('.comment').attr('data-id');
+      ownLevel = parseInt($(this).closest('.comment').attr('data-level'), 10) + 1;
     }
+	
     // Send the data using post
-
     //var posting = $.post(url, { parentId: parentId, data: data }, null, 'json');
     var posting = $.post(url, data + '&parentID=' + parentId, null, 'json');
-    //$.post( "test.php", $( "#testform" ).serialize() );
-    // Put the results in a div
+	
+    // Register events to ajax call
     posting.done(function (response) {
-      alert('success');
-		console.log("Response Data (done)", JSON.parse(JSON.stringify(response)));
-      //response = JSON.parse(response);
-      var message = response.status ? response.message : 'Error: ' + response.message;
+//alert('success');
+//console.log("Response Data (done)", JSON.parse(JSON.stringify(response)));
+      //response = JSON.parse(response); //not needed, post was done using json
       commentForm.after(commentAlert);
-      commentAlert.empty().append(message);
       if (!response.status) {
-        return;
+        //should not trigger at all, if all bad requests return the right http status code
+        //i.e. <> 200 success => thus triggering posting.fail()
+        //leave this check just in case
+        commentAlert.stop().css('opacity', 1).text('Error: ' + response.message).fadeIn(30).fadeOut(5000);
+        return;   
       }
       if (response.status) {
-		var newMedia = `
-				<div class='comment comment-level-{{comment.level|e}}' data-Id='{{comment.id}}' >
-				  <div class='comment-left'>
-					<a href='#'>
-					  <img class='comment-object' src='https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon' alt='user icon'>
-					</a>
-				  </div>
-				  <div class='comment-body'>
-					<div class='comment-heading'>
-						<div class='comment-title'><h4>{{comment.title}}</h4></div>
-						<div class='comment-reply'><a class='comment-add-reply' href='#'>{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a></div>
-						<div class='comment-meta'>{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>
-					</div>
-					<div class='comment-text' >
-						{{comment.text}}
-					</div>
-					{{nested}}
-				  </div>
-				</div>
-`;
-        newMedia = newMedia.replace('{{comment.id}}', response.id);
-        newMedia = newMedia.replace('{{comment.level|e}}', response.level);
-        newMedia = newMedia.replace('{{comment.email|trim|lower|md5}}', response.hash);
-        newMedia = newMedia.replace('{{parent_id}}', response.data.parent_id);
-        newMedia = newMedia.replace('{{comment.title}}', response.data.title);
-        newMedia = newMedia.replace('{{comment.text}}', response.data.text);
-        newMedia = newMedia.replace('{{comment.author}}', response.data.name);
-        //newMedia = newMedia.replace('{{comment.date|e}}', response.data.name);
-		if ($( "div[data-Id='" + response.data.parent_id + "']" ).length > 0) {
-			$( "div[data-Id='" + response.data.parent_id + "']" ).first().after(newMedia);
-		} else {
+        commentAlert.css('color', 'green').empty().append(document.createTextNode( response.message )).fadeIn(30);
+		var newMedia = "<div class='comment comment-level-{{comment.level|e}} comment-flag-new' data-level='{{comment.level}}' data-id='{{comment.id}}' >" + 
+				  "<div class='comment-left'>" +
+					"<a href='#'>" +
+					  "<img class='comment-object' src='https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon' alt='user icon'>" +
+					"</a>" +
+				  "</div>" +
+				  "<div class='comment-body'>" +
+					"<div class='comment-heading'>" +
+						"<div class='comment-title'><h4>{{comment.title}}</h4></div>" +
+						"<div class='comment-reply'><a class='comment-add-reply' href='#'><i class='fa fa-reply' title='{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}'></i> {{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a></div>" +
+						"<div class='comment-meta'>{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>" +
+					"</div>" +
+					"<div class='comment-text' >" +
+						"{{comment.text}}" +
+					"</div>" +
+					"{{nested}}" +
+				  "</div>" +
+				"</div>";
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.id}}"), 'g'), response.data.id);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.level|e}}"), 'g'), ownLevel);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.level}}"), 'g'), ownLevel);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.email|trim|lower|md5}}"), 'g'), response.data.hash);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{parent_id}}"), 'g'), response.data.parent_id);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.title}}"), 'g'), response.data.title);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.text}}"), 'g'), response.data.text);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.author}}"), 'g'), response.data.name);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.date|e}}"), 'g'), response.data.date);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{nested}}"), 'g'), '');
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}"), 'g'), response.data.ADD_REPLY);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}}"), 'g'), response.data.WRITTEN_ON);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.BY'|t}}"), 'g'), response.data.BY);
+        if ($( "div[data-id='" + response.data.parent_id + "']" ).length > 0) {
+			$( "div[data-id='" + response.data.parent_id + "']" ).first().after(newMedia);
+        } else {
 			$( "div.comments" ).last().prepend(newMedia);
-		}
-        //phpComment.commentForm.before(newMedia);
-        //phpComment.titleField.val("");
-        //phpComment.bodyField.val("");
+        }
       }
       setTimeout(function () {
-        commentForm.hide(3000);
+        commentForm.hide(2000);
+		commentAlert.fadeOut(5000);
       }, 5000);
     });
     posting.fail(function (status, error, title) {
-      alert('error');
-		console.log("Response Data (fail)", JSON.parse(JSON.stringify(status)));
+//alert('error');
+//console.log("Response Data (fail)", JSON.parse(JSON.stringify(status)));
       commentForm.after(commentAlert);
       commentAlert.empty().append("<p>TEST</p>");
       commentAlert.append("<p>" + status + "</p>");
       commentAlert.append("<p>" + error + "</p>");
       commentAlert.append("<p>" + title + "</p>");
     });
-    posting.always(function (test) {
+    posting.always(function () {
       //alert("finished, be it successful or not");
-      //test = JSON.parse(test);
-      //test = test.serialize();
-	  //alert(test);
     });
   });
 });
