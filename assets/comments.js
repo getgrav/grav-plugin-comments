@@ -2,9 +2,9 @@ function escapeRegExp(str) {
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 jQuery(document).ready(function () {
-  var commentForm = $(document).find('.comments-form');
-  var commentSection = $(document).find('.comments').first();
-  var commentAlert = $(document).find('.alert').first();
+  var commentForm = $('#comments-form'); //$(document).find('.comments-form').first();
+  var commentSection = $('#comments-section'); //$(document).find('.comments').first();
+  var commentAlert = $('#comments-alert'); //$(document).find('.alert').first();
   
   //hide form, show link
   commentForm.hide();
@@ -13,20 +13,78 @@ jQuery(document).ready(function () {
   //show comment form above comments section (new comment thread)
   $('body').on('click', '.comment-add-new', function (e) {
     e.preventDefault();
-    //commentForm.hide(1000);
+	if ($(this).prev().filter('#comments-form').length > 0) {
+		//form is already in the right place.
+		//just make sure it is visible.
+		commentForm.show();
+		return;
+	}
+    commentForm.hide(); //hide it to make sure that it is not shown after move to make "show" transition work.
     $(this).before(commentForm);
     commentForm.show('slow');
-    commentAlert.slideUp();
+    commentAlert.empty().slideUp();
   });
   
   //show comment form below selected comment (reply to existing comment)
   $('body').on('click', '.comment-add-reply', function (e) {
     e.preventDefault();
-    var media = $(this).closest('.comment');
+    var comment = $(this).closest('.comment');
+	if (comment.find('#comments-form').length > 0) {
+		//form is already in the right place.
+		//just make sure it is visible.
+		commentForm.show();
+		return;
+	}
     commentForm.hide();
-    media.find('>.comment-body>.comment-text').after(commentForm);
+    comment.find('.comment-body').last().append(commentForm);
     commentForm.show('slow');
-    commentAlert.slideUp();
+    commentAlert.empty().slideUp();
+  });
+  
+  //delete comment (authorized user only)
+  $('body').on('click', '.comment-delete', function (e) {
+    e.preventDefault();
+    var comment = $(this).closest('.comment');
+    var id = parseInt(comment.attr('data-id'), 10);
+    var level = parseInt(comment.attr('data-level'), 10);
+    var nonce = commentForm.find("input[name='form-nonce']").val();
+	if (comment.next().filter(".comment[data-level='" + (level + 1) + "']").length > 0) {
+		alert('Deletion not allowed. There are replies to this comment. Please delete them first.');
+		return;
+	}
+    var url = commentForm.attr( "action" );
+    var posting = $.post(url, { action: 'delete', id: id, nonce: nonce}, null, 'json');
+    // Register events to ajax call
+    posting.done(function (response) {
+    
+	//make sure that commentForm is definitely not within the deleted DOM part.
+	//hide
+	//temporary move it outside the comment selected for deletion. (this definitely exists, not taking any chances here)
+	//finally move back to start of commentSection. (preferred target) 
+	//Hint: Don't forget commentAlert as it is not inside the form.
+    commentAlert.empty().hide();
+    commentForm.hide();
+	comment.before(commentForm);
+	comment.before(commentAlert);
+	commentSection.prepend(commentAlert);
+	commentSection.prepend(commentForm);
+	//remove the comment and all content from DOM.
+	//detach would be a soft delete but as there is no reason to reuse the deleted comment, means should not be provided.
+	comment.remove();
+    });
+    posting.fail(function (status, error, title) {
+//alert('error');
+//console.log("Response Data (fail)", JSON.parse(JSON.stringify(status)));
+      commentForm.after(commentAlert);
+      commentAlert.show();
+      commentAlert.empty().append("<p>Error: </p>");
+      commentAlert.append("<p>" + JSON.stringify(status) + "</p>");
+      commentAlert.append("<p>" + JSON.stringify(error) + "</p>");
+      commentAlert.append("<p>" + JSON.stringify(title) + "</p>");
+    });
+    posting.always(function () {
+      //alert("finished, be it successful or not");
+    });
   });
   
   // Attach a submit handler to the form
@@ -65,14 +123,12 @@ jQuery(document).ready(function () {
         commentAlert.css('color', 'green').empty().append(document.createTextNode( response.message )).fadeIn(30);
 		var newMedia = "<div class='comment comment-level-{{comment.level|e}} comment-flag-new' data-level='{{comment.level}}' data-id='{{comment.id}}' >" + 
 				  "<div class='comment-left'>" +
-					"<a href='#'>" +
-					  "<img class='comment-object' src='https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon' alt='user icon'>" +
-					"</a>" +
+					"<img class='comment-object' src='https://www.gravatar.com/avatar/{{comment.email|trim|lower|md5}}?d=identicon' alt='user icon'>" +
 				  "</div>" +
 				  "<div class='comment-body'>" +
 					"<div class='comment-heading'>" +
 						"<div class='comment-title'><h4>{{comment.title}}</h4></div>" +
-						"<div class='comment-reply'><a class='comment-add-reply' href='#'><i class='fa fa-reply' title='{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}'></i> {{'PLUGIN_COMMENTS.ADD_REPLY'|t}}</a></div>" +
+						"<div class='comment-reply'><a class='comment-add-reply' href='#'><i class='fa fa-reply' title='{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}'></i> {{'PLUGIN_COMMENTS.REPLY'|t}}</a></div>" +
 						"<div class='comment-meta'>{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}</div>" +
 					"</div>" +
 					"<div class='comment-text' >" +
@@ -92,6 +148,7 @@ jQuery(document).ready(function () {
         newMedia = newMedia.replace(new RegExp(escapeRegExp("{{comment.date|e}}"), 'g'), response.data.date);
         newMedia = newMedia.replace(new RegExp(escapeRegExp("{{nested}}"), 'g'), '');
         newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.ADD_REPLY'|t}}"), 'g'), response.data.ADD_REPLY);
+        newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.REPLY'|t}}"), 'g'), response.data.REPLY);
         newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.WRITTEN_ON'|t}}"), 'g'), response.data.WRITTEN_ON);
         newMedia = newMedia.replace(new RegExp(escapeRegExp("{{'PLUGIN_COMMENTS.BY'|t}}"), 'g'), response.data.BY);
         if ($( "div[data-id='" + response.data.parent_id + "']" ).length > 0) {
@@ -101,7 +158,7 @@ jQuery(document).ready(function () {
         }
       }
       setTimeout(function () {
-        commentForm.hide(2000);
+        commentForm.slideUp();
 		commentAlert.fadeOut(5000);
       }, 5000);
     });
@@ -109,10 +166,11 @@ jQuery(document).ready(function () {
 //alert('error');
 //console.log("Response Data (fail)", JSON.parse(JSON.stringify(status)));
       commentForm.after(commentAlert);
-      commentAlert.empty().append("<p>TEST</p>");
-      commentAlert.append("<p>" + status + "</p>");
-      commentAlert.append("<p>" + error + "</p>");
-      commentAlert.append("<p>" + title + "</p>");
+      commentAlert.show();
+      commentAlert.empty().append("<p>Error: </p>");
+      commentAlert.append("<p>" + JSON.stringify(status) + "</p>");
+      commentAlert.append("<p>" + JSON.stringify(error) + "</p>");
+      commentAlert.append("<p>" + JSON.stringify(title) + "</p>");
     });
     posting.always(function () {
       //alert("finished, be it successful or not");

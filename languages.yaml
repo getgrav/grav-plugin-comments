@@ -1,10 +1,12 @@
 de:
   PLUGIN_COMMENTS:
     ADD_NEW: Kommentar hinzufügen
-    ADD_REPLY: Antworten
+    ADD_REPLY: Auf Kommentar antworten
     ADD_COMMENT: Kommentar hinzufügen
     DELETE_COMMENT: Kommentar löschen
-    SUCCESS: Der Kommentar wurde erfolgreich gespeichert.
+    REPLY: Antworten
+    DELETE: Löschen
+    SUCCESS: "Der Kommentar wurde erfolgreich gespeichert."
     COMMENTS: Kommentare
     EMAIL_NOT_CONFIGURED: Email nicht konfiguriert
     NEW_COMMENT_EMAIL_SUBJECT: 'Neuer Kommentar für %1$s'
@@ -27,10 +29,12 @@ de:
 en:
   PLUGIN_COMMENTS:
     ADD_NEW: Add a comment
-    ADD_REPLY: Reply
+    ADD_REPLY: Reply to comment
     ADD_COMMENT: Add a comment
     DELETE_COMMENT: Delete comment
-    SUCCESS: Comment has been saved successfully.
+    REPLY: Reply
+    DELETE: Delete
+    SUCCESS: "Comment has been saved successfully."
     COMMENTS: Comments
     EMAIL_NOT_CONFIGURED: Email not configured
     NEW_COMMENT_EMAIL_SUBJECT: 'New comment on %1$s'

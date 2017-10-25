@@ -180,21 +180,70 @@ class CommentsPlugin extends Plugin
 //        $this->only_full_stars = $this->config->get('plugins.star-ratings.only_full_stars');
         $callback = $this->config->get('plugins.comments.ajax_callback');
         // Process comment if required
-        if ($is_ajax || $callback === $this->grav['uri']->path()) {
-            // try to add the comment
-            $result = $this->addComment(true);
-            echo json_encode([
-				'status' => $result[0],
-				'message' => $result[1],
-				'data' => $result[2],
-//				'data' => [
-//					'score' => $result[2][0],
-//					'count' => $result[2][1]
-//				]
-			]);
+        if ($is_ajax) {// || $callback === $this->grav['uri']->path()
+			$action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
+			switch ($action) {
+				case 'addComment':
+				case '':
+				case null:
+					// try to add the comment
+					$result = $this->addComment(true);
+					echo json_encode([
+						'status' => $result[0],
+						'message' => $result[1],
+						'data' => $result[2],
+					]);
+					break;
+				case 'delete':
+					// try to delete the comment
+					$result = $this->deleteComment(true);
+					echo json_encode([
+						'status' => $result[0],
+						'message' => $result[1],
+						'data' => $result[2],
+					]);
+					break;
+				default:
+					//request unknown, present error page
+					//Set a 400 (bad request) response code.
+					http_response_code(400);
+					echo 'request malformed - action unknown';
+					break;
+			}
             exit(); //prevents the page frontend from beeing displayed.
         }
     }
+
+    public function deleteComment()
+    {
+        $language = $this->grav['language'];
+        if (!$this->grav['user']->authorize('admin.super')) {
+			http_response_code(403);
+            return [false, 'access forbidden', [0, 0]];
+        }
+		$id		= filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+		$nonce	= filter_input(INPUT_POST, 'nonce', FILTER_SANITIZE_STRING);
+        // ensure both values are sent
+        if (is_null($id) || is_null($nonce)) {
+            // Set a 400 (bad request) response code and exit.
+            http_response_code(400);
+            return [false, 'request malformed - missing parameter(s)', [0, 0]];
+        }
+        if (!Utils::verifyNonce($nonce, 'comments')) {
+			http_response_code(403);
+            return [false, 'Invalid security nonce', [0, $nonce]];
+        }
+		$lang = $this->grav['language']->getLanguage();
+		$path = $this->grav['page']->path();
+		$route = $this->grav['page']->route();
+        $data = $this->removeComment($route, $path, $id, $lang);
+		if ($data[0]) {
+			return [true, $language->translate('PLUGIN_COMMENTS.DELETE_SUCCESS'), $data[1]];
+		} else {
+			http_response_code(403); //forbidden
+			return [false, $language->translate('PLUGIN_COMMENTS.DELETE_FAIL'), $data[1]];
+		}
+	}
 
     public function addComment($is_ajax = false)
     {
@@ -254,6 +303,7 @@ class CommentsPlugin extends Plugin
 			'level' => 0,
 			'hash' => md5(strtolower(trim($comment['email']))),
 			'ADD_REPLY' => $language->translate('PLUGIN_COMMENTS.ADD_REPLY'),
+			'REPLY' => $language->translate('PLUGIN_COMMENTS.REPLY'),
 			'WRITTEN_ON' => $language->translate('PLUGIN_COMMENTS.WRITTEN_ON'),
 			'BY' => $language->translate('PLUGIN_COMMENTS.BY'),
 		);
@@ -263,6 +313,123 @@ class CommentsPlugin extends Plugin
 // http_response_code(500);
 		
 	}
+    }
+
+    /**
+     * Handle form processing instructions.
+     *
+     * @param Event $event
+     */
+    public function removeComment($route, $path, $id, $lang)
+    {
+				$entry_removed = false;
+				$message = '';
+				$date = time();//date('D, d M Y H:i:s', time());
+				
+				/******************************/
+				/** store comments with page **/
+				/******************************/
+				$localfilename = $path . '/comments.yaml';
+				$localfile = CompiledYamlFile::instance($localfilename);
+                if (file_exists($localfilename)) {
+                    $data = $localfile->content();
+					if(isset($data['comments']) && is_array($data['comments'])) {
+						foreach($data['comments'] as $key => $comment) {
+							if(!empty($comment['parent_id']) && $comment['parent_id'] == $id) {
+								//hit an existing comment that is a reply to comment selected for deletion.
+								//deletion of "parent" comment not allowed to preserve integrity of nested comments.
+								//TODO: Alternatively allow it to mark parent comments as deleted
+								//      and make sure (via Comment class / setCommentLevels) that children are
+								//      filtered out from fetch regardless of their own deletion state.
+								$data['comments'][$key] = array_merge(array('deleted' => ''), $comment);
+								//set date after merge
+								//reason: could be possible that "deleted" already exists (e.g. false or '') in $comment which would overwrite the first (newly added) occurence
+								$data['comments'][$key]['deleted'] = $date;
+								//no need to look further as ids are supposed to be unique.
+								$localfile->save($data);
+								$entry_removed = false;
+								$reply_id = empty($comment['id']) ? '' : $comment['id'];
+								$message = "Found active reply ($reply_id) for selected comment ($id).";
+								return [$entry_removed, $message];
+								break;
+							}
+						}
+						foreach($data['comments'] as $key => $comment) {
+							if(!empty($comment['id']) && $comment['id'] == $id) {
+								//add deleted as first item in array (better readability in file)
+								$data['comments'][$key] = array_merge(array('deleted' => ''), $comment);
+								//set date after merge
+								//reason: could be possible that "deleted" already exists (e.g. false or '') in $comment which would overwrite the first (newly added) occurence
+								$data['comments'][$key]['deleted'] = $date;
+								//no need to look further as ids are supposed to be unique.
+								$localfile->save($data);
+								$entry_removed = true;
+								$message = "Deleted comment ($id) via path ($path)";
+								break;
+							}
+						}
+					}
+                } else {
+					//nothing
+                }
+				/**********************************/
+				/** store comments in index file **/
+				/**********************************/
+				$indexfilename = DATA_DIR . 'comments/index.yaml';
+				$indexfile = CompiledYamlFile::instance($indexfilename);
+                if (file_exists($indexfilename)) {
+                    $dataIndex = $indexfile->content();
+					if(isset($dataIndex['comments']) && is_array($dataIndex['comments'])) {
+						foreach($dataIndex['comments'] as $key => $comment) {
+							if(!empty($comment['page']) && !empty($comment['id']) && $comment['page'] == $route && $comment['id'] == $id) {
+								//add deleted as first item in array (better readability in file)
+								$dataIndex['comments'][$key] = array_merge(array('deleted' => ''), $comment);
+								//set date after merge
+								//reason: could be possible that "deleted" already exists (e.g. false or '') in $comment which would overwrite the first (newly added) occurence
+								$dataIndex['comments'][$key]['deleted'] = $date;
+								//no need to look further as ids are supposed to be unique.
+								$indexfile->save($dataIndex);
+								break;
+							}
+						}
+					}
+                } else {
+					//nothing
+                }
+				/**************************************/
+				/** store comments in old data files **/
+				/** TODO: remove as soon as admin    **/
+				/**       panel uses new index file  **/
+				/**************************************/
+                $filename = DATA_DIR . 'comments';
+                $filename .= ($lang ? '/' . $lang : '');
+                $filename .= $path . '.yaml';
+                $file = CompiledYamlFile::instance($filename);
+
+                if (file_exists($filename)) {
+                    $dataLegacy = $file->content();
+					if(isset($dataLegacy['comments']) && is_array($dataLegacy['comments'])) {
+						foreach($dataLegacy['comments'] as $key => $comment) {
+							if(!empty($comment['id']) && $comment['id'] == $id) {
+								//add deleted as first item in array (better readability in file)
+								$dataLegacy['comments'][$key] = array_merge(array('deleted' => ''), $comment);
+								//set date after merge
+								//reason: could be possible that "deleted" already exists (e.g. false or '') in $comment which would overwrite the first (newly added) occurence
+								$dataLegacy['comments'][$key]['deleted'] = $date;
+								//no need to look further as ids are supposed to be unique.
+								$file->save($dataLegacy);
+								break;
+							}
+						}
+					}
+                } else {
+					//nothing
+                }
+
+                //clear cache
+                $this->grav['cache']->delete($this->comments_cache_id);
+				
+				return [$entry_removed, $message];
     }
 
     /**
@@ -532,8 +699,14 @@ class CommentsPlugin extends Plugin
 		}
 		$levelsflat = array();
 		foreach($comments as $key => $comment) {
-			$levelsflat[$comment['id']]['parent'] = $comment['parent'];
-			$levelsflat[$comment['id']]['class'] = new Comment($comment['id'], $comments[$key]);
+			if(!empty($comment['deleted'])) {
+				//if field "deleted" exists and is filled with a true value then ignore the comment completely.
+				//TODO: This only works on this position as long as it is forbidden to delete comments that have active replies (children).
+				//      Otherwise implement that children get the deleted flag recursively or are ignored via Comment class.
+			} else {
+				$levelsflat[$comment['id']]['parent'] = $comment['parent'];
+				$levelsflat[$comment['id']]['class'] = new Comment($comment['id'], $comments[$key]);
+			}
 		}
 		//get starting points (entries without valid parent = root element)
 		$leveltree = array();
