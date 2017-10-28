@@ -1,23 +1,15 @@
 <?php
 namespace Grav\Plugin;
 
-use Grav\Common\File\CompiledJsonFile;
+use Grav\Common\Plugin;
+use Grav\Common\Utils;
 use Grav\Common\File\CompiledYamlFile;
 use Grav\Common\Filesystem\Folder;
 use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
-use Grav\Common\GPM\GPM;
-use Grav\Common\Grav;
 use Grav\Common\Page\Page;
-use Grav\Common\Page\Pages;
-use Grav\Common\Plugin;
-use Grav\Common\User\User;
-use Grav\Common\Utils;
 use RocketTheme\Toolbox\Event\Event;
-use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
-
-require_once '/html/apps/grav/user/plugins/comments/class/Comment.php';
-use Grav\Plugin\Comment;
+require_once PLUGINS_DIR .  'comments/class/Comment.php';
 
 class CommentsPlugin extends Plugin
 {
@@ -56,6 +48,7 @@ class CommentsPlugin extends Plugin
     public function onTwigSiteVariables() {
         $this->grav['twig']->enable_comments_plugin = $this->enable;
         $this->grav['twig']->comments = $this->fetchComments();
+        $this->grav['twig']->recentComments = $this->getRecentComments();
         if ($this->config->get('plugins.comments.built_in_css')) {
             $this->grav['assets']
                 ->addCss('plugin://comments/assets/comments.css');
@@ -99,7 +92,7 @@ class CommentsPlugin extends Plugin
     /**
      * Frontend side initialization
      */
-    public function initializeFrontend()
+    private function initializeFrontend()
     {
         $this->calculateEnable();
 
@@ -126,7 +119,7 @@ class CommentsPlugin extends Plugin
     /**
      * Admin side initialization
      */
-    public function initializeAdmin()
+    private function initializeAdmin()
     {
         /** @var Uri $uri */
         $uri = $this->grav['uri'];
@@ -134,6 +127,9 @@ class CommentsPlugin extends Plugin
         $this->enable([
             'onTwigTemplatePaths' => ['onTwigAdminTemplatePaths', 0],
             'onAdminMenu' => ['onAdminMenu', 0],
+            'onAdminTaskExecute' => ['onAdminTaskExecute', 0],
+            'onAdminAfterSave' => ['onAdminAfterSave', 0],
+            'onAdminAfterDelete' => ['onAdminAfterDelete', 0],
             'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
         ]);
 
@@ -157,6 +153,22 @@ class CommentsPlugin extends Plugin
      */
     public function onPluginsInitialized()
     {
+        if ('/recent' === $this->grav['uri']->path()) {
+            //TODO TEST
+            echo PAGES_DIR;
+            
+            echo "<br />";
+            
+            $test = $this->getRecentComments(25);
+            var_dump($test[0]);
+            echo '<br /><hr /><br />';
+            var_dump($test[1]);
+            echo '<br /><hr /><br />';
+            var_dump($test[2]);
+            echo '<br /><hr /><br />';
+            exit();
+        }
+        
         if ($this->isAdmin()) {
             $this->initializeAdmin();
         } else {
@@ -170,15 +182,7 @@ class CommentsPlugin extends Plugin
     public function onPageInitialized()
     {
 		$is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-        // initialize with page settings (post-cache)
-//        if (!$this->isAdmin() && isset($this->grav['page']->header()->{'star-ratings'})) {
-//			// if not in admin merge potential page-level configs
-//            $this->config->set('plugins.star-ratings', $this->mergeConfig($page));
-//        }
-//        $this->callback = $this->config->get('plugins.star-ratings.callback');
-//        $this->total_stars = $this->config->get('plugins.star-ratings.total_stars');
-//        $this->only_full_stars = $this->config->get('plugins.star-ratings.only_full_stars');
-        $callback = $this->config->get('plugins.comments.ajax_callback');
+        //$callback = $this->config->get('plugins.comments.ajax_callback');
         // Process comment if required
         if ($is_ajax) {// || $callback === $this->grav['uri']->path()
 			$action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
@@ -187,7 +191,7 @@ class CommentsPlugin extends Plugin
 				case '':
 				case null:
 					// try to add the comment
-					$result = $this->addComment(true);
+					$result = $this->addCommentAjax(true);
 					echo json_encode([
 						'status' => $result[0],
 						'message' => $result[1],
@@ -214,7 +218,12 @@ class CommentsPlugin extends Plugin
         }
     }
 
-    public function deleteComment()
+    /**
+     * Validate ajax input before deleting comment
+     * 
+     * @return boolean[]|string[]|array[][]
+     */
+    private function deleteComment()
     {
         $language = $this->grav['language'];
         if (!$this->grav['user']->authorize('admin.super')) {
@@ -237,7 +246,7 @@ class CommentsPlugin extends Plugin
 		$path = $this->grav['page']->path();
 		$route = $this->grav['page']->route();
         $data = $this->removeComment($route, $path, $id, $lang);
-		if ($data[0]) {
+        if ($data[0]) {
 			return [true, $language->translate('PLUGIN_COMMENTS.DELETE_SUCCESS'), $data[1]];
 		} else {
 			http_response_code(403); //forbidden
@@ -245,9 +254,13 @@ class CommentsPlugin extends Plugin
 		}
 	}
 
-    public function addComment($is_ajax = false)
+    /**
+     * Validate ajax input before adding comment
+     * 
+     * @return boolean[]|string[]|array[][]
+     */
+    private function addCommentAjax()
     {
-	if($is_ajax) {
         $language = $this->grav['language'];
         if (!$_SERVER["REQUEST_METHOD"] == "POST") {
 			// Not a POST request, set a 403 (forbidden) response code.
@@ -273,7 +286,7 @@ class CommentsPlugin extends Plugin
 		$input['form-nonce']	= filter_input(INPUT_POST, 'form-nonce', FILTER_SANITIZE_STRING);
         if (!Utils::verifyNonce($input['form-nonce'], 'comments')) {
 			http_response_code(403);
-            return [false, 'Invalid security nonce', [$_POST, $input['form-nonce']]];
+            return [false, 'Invalid security nonce', [0, $input['form-nonce']]];
         }
         // ensure both values are sent
         if (is_null($input['title']) || is_null($input['text'])) {
@@ -291,7 +304,9 @@ class CommentsPlugin extends Plugin
 		$lang = $this->grav['language']->getLanguage();
 		$path = $this->grav['page']->path();
 		$route = $this->grav['page']->route();
-        $comment = $this->saveComment($route, $path, $input['parent_id'], $lang, $input['text'], $input['name'], $input['email'], $input['title']);
+		$user = $this->grav['user']->authenticated ? $this->grav['user']->username : '';
+		$isAdmin = $this->grav['user']->authorize('admin.login');
+        $comment = $this->saveComment($route, $path, $input['parent_id'], $lang, $input['text'], $input['name'], $input['email'], $input['title'], $user, $isAdmin);
         //$comments = $this->fetchComments();
 		$data = array(
 			'parent_id' => $comment['parent'],
@@ -300,19 +315,15 @@ class CommentsPlugin extends Plugin
 			'title' => $comment['title'],
 			'name' => $comment['author'],
 			'date' => $comment['date'],
-			'level' => 0,
 			'hash' => md5(strtolower(trim($comment['email']))),
+			'authenticated' => !empty($comment['user']),
+			'isAdmin' => !empty($comment['isAdmin']),
 			'ADD_REPLY' => $language->translate('PLUGIN_COMMENTS.ADD_REPLY'),
 			'REPLY' => $language->translate('PLUGIN_COMMENTS.REPLY'),
 			'WRITTEN_ON' => $language->translate('PLUGIN_COMMENTS.WRITTEN_ON'),
 			'BY' => $language->translate('PLUGIN_COMMENTS.BY'),
 		);
         return [true, $language->translate('PLUGIN_COMMENTS.SUCCESS'), $data];
-	} else {
-// Set a 500 (internal server error) response code.
-// http_response_code(500);
-		
-	}
     }
 
     /**
@@ -320,7 +331,7 @@ class CommentsPlugin extends Plugin
      *
      * @param Event $event
      */
-    public function removeComment($route, $path, $id, $lang)
+    private function removeComment($route, $path, $id, $lang)
     {
 				$entry_removed = false;
 				$message = '';
@@ -396,36 +407,6 @@ class CommentsPlugin extends Plugin
                 } else {
 					//nothing
                 }
-				/**************************************/
-				/** store comments in old data files **/
-				/** TODO: remove as soon as admin    **/
-				/**       panel uses new index file  **/
-				/**************************************/
-                $filename = DATA_DIR . 'comments';
-                $filename .= ($lang ? '/' . $lang : '');
-                $filename .= $path . '.yaml';
-                $file = CompiledYamlFile::instance($filename);
-
-                if (file_exists($filename)) {
-                    $dataLegacy = $file->content();
-					if(isset($dataLegacy['comments']) && is_array($dataLegacy['comments'])) {
-						foreach($dataLegacy['comments'] as $key => $comment) {
-							if(!empty($comment['id']) && $comment['id'] == $id) {
-								//add deleted as first item in array (better readability in file)
-								$dataLegacy['comments'][$key] = array_merge(array('deleted' => ''), $comment);
-								//set date after merge
-								//reason: could be possible that "deleted" already exists (e.g. false or '') in $comment which would overwrite the first (newly added) occurence
-								$dataLegacy['comments'][$key]['deleted'] = $date;
-								//no need to look further as ids are supposed to be unique.
-								$file->save($dataLegacy);
-								break;
-							}
-						}
-					}
-                } else {
-					//nothing
-                }
-
                 //clear cache
                 $this->grav['cache']->delete($this->comments_cache_id);
 				
@@ -437,7 +418,7 @@ class CommentsPlugin extends Plugin
      *
      * @param Event $event
      */
-    public function saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title)
+    private function saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title, $user = "", $isAdmin = false)
     {
 				$date = date('D, d M Y H:i:s', time());
 				
@@ -464,7 +445,9 @@ class CommentsPlugin extends Plugin
 					'text' => $text,
 					'date' => $date,
 					'author' => $name,
-					'email' => $email
+					'email' => $email,
+					'user' => $user,
+					'isAdmin' => !empty($isAdmin),
 				];
 				$data['comments'][] = $newComment;
                 $localfile->save($data);
@@ -493,39 +476,6 @@ class CommentsPlugin extends Plugin
 				];
                 $indexfile->save($dataIndex);
 
-				/**************************************/
-				/** store comments in old data files **/
-				/** TODO: remove as soon as admin    **/
-				/**       panel uses new index file  **/
-				/**************************************/
-                $filename = DATA_DIR . 'comments';
-                $filename .= ($lang ? '/' . $lang : '');
-                $filename .= $path . '.yaml';
-                $file = CompiledYamlFile::instance($filename);
-
-                if (file_exists($filename)) {
-                    $dataLegacy = $file->content();
-
-                    $dataLegacy['comments'][] = [
-                        'text' => $text,
-                        'date' => $date,
-                        'author' => $name,
-                        'email' => $email
-                    ];
-                } else {
-                    $dataLegacy = array(
-                        'title' => $title,
-                        'lang' => $lang,
-                        'comments' => array([
-                            'text' => $text,
-                            'date' => $date,
-                            'author' => $name,
-                            'email' => $email
-                        ])
-                    );
-                }
-
-                $file->save($dataLegacy);
 
                 //clear cache
                 $this->grav['cache']->delete($this->comments_cache_id);
@@ -560,12 +510,16 @@ class CommentsPlugin extends Plugin
                 $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 				$parent_id = 0;
 
+				$username = '';
+				$isAdmin = false;
                 if (isset($this->grav['user'])) {
                     $user = $this->grav['user'];
                     if ($user->authenticated) {
                         $name = $user->fullname;
                         $email = $user->email;
                     }
+					$username = $this->grav['user']->authenticated ? $this->grav['user']->username : '';
+					$isAdmin = $this->grav['user']->authorize('admin.login');
                 }
 
                 /** @var Language $language */
@@ -574,9 +528,106 @@ class CommentsPlugin extends Plugin
 				$path = $this->grav['page']->path();
 				$route = $this->grav['page']->route();
 
-                $this->saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title);
+                $this->saveComment($route, $path, $parent_id, $lang, $text, $name, $email, $title, $username, $isAdmin);
 
                 break;
+        }
+    }
+
+    private function getRecentComments($limit = 10) {
+        //TODO
+/*
+        //init cache id
+        $cache = $this->grav['cache'];
+        $comments_cache_id = md5('comments-data' . $cache->getKey() . '-' . $uri->url());
+        $uri = $this->grav['uri'];
+        
+        //search in cache
+        if ($comments = $cache->fetch($comments_cache_id)) {
+            return $comments;
+        }
+        
+        $comments = $this->getDataFromFilename($filename)['comments'];
+        $comments = $this->setCommentLevels($comments);
+        //save to cache if enabled
+        $cache->save($this->comments_cache_id, $comments);
+ */
+        $path = PAGES_DIR;
+        $dirItr     = new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
+        $itrFilter = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::SELF_FIRST);
+        $filesItr = new \RegexIterator($itrFilter, '/^.+comments\.yaml$/i');
+        $files = array();
+        $global_stats = array(
+            'active_entries' => 0,
+            'deleted_entries' => 0,
+            'active_comments' => 0,
+            'deleted_comments' => 0,
+            'active_replies' => 0,
+            'deleted_replies' => 0,
+            'pages_with_active_entries' => 0,
+        );
+        $page_stats = array();
+        $comments = array();
+        foreach ($filesItr as $filepath => $file) {
+            if ($file->isDir()) {
+               // this should never trigger as we are looking vor yamls only
+            } else {
+                $page_stats[$filepath] = array(
+                    'active_entries' => 0,
+                    'deleted_entries' => 0,
+                    'active_comments' => 0,
+                    'deleted_comments' => 0,
+                    'active_replies' => 0,
+                    'deleted_replies' => 0,
+                    'latest_active_entry' => 0,
+                );
+                $localfile = CompiledYamlFile::instance($filepath);
+                $localcomments = $localfile->content();
+                if (!empty($localcomments['comments']) && is_array($localcomments['comments'])) {
+                    foreach ($localcomments['comments'] as $comment) {
+                        if (!empty($comment['deleted'])) {
+                            empty($comment['parent']) ? $page_stats[$filepath]['deleted_comments']++ : $page_stats[$filepath]['deleted_replies']++;
+                            empty($comment['parent']) ? $global_stats['deleted_comments']++ : $global_stats['deleted_replies']++;
+                            $page_stats[$filepath]['deleted_entries']++;
+                            $global_stats['deleted_entries']++;
+                        } else {
+                            empty($comment['parent']) ? $page_stats[$filepath]['active_comments']++ : $page_stats[$filepath]['active_replies']++;
+                            empty($comment['parent']) ? $global_stats['active_comments']++ : $global_stats['active_replies']++;
+                            $page_stats[$filepath]['active_entries']++;
+                            $global_stats['active_entries']++;
+                            
+                            //use unix timestamp for comparing and sorting
+                            if(is_int($comment['date'])) {
+                                $time = $comment['date'];
+                            } else {
+                                $time = \DateTime::createFromFormat('D, d M Y H:i:s', $comment['date'])->getTimestamp();
+                            }
+                            
+                            if (empty($page_stats[$filepath]['latest_active_entry']) || $page_stats[$filepath]['latest_active_entry'] < $time) {
+                                $page_stats[$filepath]['latest_active_entry'] = $time;
+                            }
+                            
+                            $comments[] = array_merge(array(
+                                'path' => $filepath,
+                                'time' => $time,
+                            ), $comment);
+                        }
+                    }
+                }
+                if (!empty($page_stats[$filepath]['latest_active_entry'])) {
+                    $global_stats['pages_with_active_entries']++;
+                }
+            }
+        }
+        usort($comments, function($a, $b) {
+            if ($a['time'] === $b['time']) return 0;
+            if ($a['time'] < $b['time']) return 1;
+            return -1;
+        });
+        if (!empty($limit) && $limit > 0 && $limit < count($comments)) {
+            return [$global_stats, $page_stats, array_slice($comments, 0, $limit)];
+        } else {
+            return [$global_stats, $page_stats, $comments];
         }
     }
 
@@ -788,11 +839,83 @@ class CommentsPlugin extends Plugin
     }
 
     /**
+     * Handle the Reindex task from the admin
+     *
+     * @param Event $e
+     */
+    public function onAdminTaskExecute(Event $e)
+    {
+        if ($e['method'] == 'taskReindexComments') {
+            $controller = $e['controller'];
+            header('Content-type: application/json');
+            if (!$controller->authorizeTask('reindexComments', ['admin.configuration', 'admin.super'])) {
+                $json_response = [
+                    'status'  => 'error',
+                    'message' => '<i class="fa fa-warning"></i> Index not created',
+                    'details' => 'Insufficient permissions to reindex the comments index file.'
+                ];
+                echo json_encode($json_response);
+                exit;
+            }
+/*TODO             // disable warnings
+            error_reporting(1);
+            // capture content
+            ob_start();
+            $this->gtnt->createIndex();
+            ob_get_clean();
+            list($status, $msg) = $this->getIndexCount();
+            $json_response = [
+                'status'  => $status ? 'success' : 'error',
+                'message' => '<i class="fa fa-book"></i> ' . $msg
+            ];
+            echo json_encode($json_response);
+ */            exit;
+        }
+    }
+
+    /**
+     * Perform an 'add' or 'update' for comment data as needed
+     *
+     * @param $event
+     * @return bool
+     */
+    public function onAdminAfterSave($event)
+    {
+        $obj = $event['object'];
+        if ($obj instanceof Page) {
+            //nothing to do
+			//save means, the page changed, but still exists
+        }
+        return true;
+    }
+    /**
+     * Perform an 'add' or 'update' for comment data as needed
+     *
+     * @param $event
+     * @return bool
+     */
+    public function onAdminAfterDelete($event)
+    {
+        $obj = $event['object'];
+        if ($obj instanceof Page) {
+            //TODO $this->deleteComment($obj);
+        }
+        return true;
+    }
+    
+    /**
      * Add navigation item to the admin plugin
      */
     public function onAdminMenu()
     {
         $this->grav['twig']->plugins_hooked_nav['PLUGIN_COMMENTS.COMMENTS'] = ['route' => $this->route, 'icon' => 'fa-file-text'];
+        $options = [
+            'authorize' => 'taskReindexComments',
+            'hint' => 'reindexes the comments index',
+            'class' => 'comments-reindex',
+            'icon' => 'fa-file-text'
+        ];
+        $this->grav['twig']->plugins_quick_tray['PLUGIN_COMMENTS.COMMENTS'] = $options;
     }
 
     /**
