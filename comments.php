@@ -9,6 +9,7 @@ use Grav\Common\Filesystem\RecursiveFolderFilterIterator;
 use Grav\Common\Page\Page;
 use RocketTheme\Toolbox\Event\Event;
 use Symfony\Component\Yaml\Yaml;
+use Twig_SimpleFunction;
 require_once PLUGINS_DIR .  'comments/class/Comment.php';
 
 class CommentsPlugin extends Plugin
@@ -48,7 +49,10 @@ class CommentsPlugin extends Plugin
     public function onTwigSiteVariables() {
         $this->grav['twig']->enable_comments_plugin = $this->enable;
         $this->grav['twig']->comments = $this->fetchComments();
-        $this->grav['twig']->recentComments = $this->getRecentComments();
+        //$this->grav['twig']->recent_comments = $this->getRecentComments(); //cannot be used for functions with arguments
+        $function = new Twig_SimpleFunction('recent_comments', [$this, 'getRecentComments']);
+        $this->grav['twig']->twig()->addFunction($function);
+        
         if ($this->config->get('plugins.comments.built_in_css')) {
             $this->grav['assets']
                 ->addCss('plugin://comments/assets/comments.css');
@@ -153,22 +157,6 @@ class CommentsPlugin extends Plugin
      */
     public function onPluginsInitialized()
     {
-        if ('/recent' === $this->grav['uri']->path()) {
-            //TODO TEST
-            echo PAGES_DIR;
-            
-            echo "<br />";
-            
-            $test = $this->getRecentComments(25);
-            var_dump($test[0]);
-            echo '<br /><hr /><br />';
-            var_dump($test[1]);
-            echo '<br /><hr /><br />';
-            var_dump($test[2]);
-            echo '<br /><hr /><br />';
-            exit();
-        }
-        
         if ($this->isAdmin()) {
             $this->initializeAdmin();
         } else {
@@ -181,7 +169,7 @@ class CommentsPlugin extends Plugin
      */
     public function onPageInitialized()
     {
-		$is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+        $is_ajax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
         //$callback = $this->config->get('plugins.comments.ajax_callback');
         // Process comment if required
         if ($is_ajax) {// || $callback === $this->grav['uri']->path()
@@ -534,24 +522,34 @@ class CommentsPlugin extends Plugin
         }
     }
 
-    private function getRecentComments($limit = 10) {
-        //TODO
-/*
-        //init cache id
+    /**
+     * Used to add a recent comments widget. Call {{ recent_comments(123,12) }} specifying an integer representing the result length.
+     *
+     * Returns three different arrays with stats and comments.
+     *
+     * @param integer $limit         max amount of comments in result set
+     * @param integer $limit_pages   max amount of pages in result set
+     *
+     * @return array|array|array global stats, page stats, list of recent comments, options
+     */
+    public function getRecentComments($limit, $limit_pages)
+    {
+        $routes = $this->grav['pages']->routes(); //routes[route] => path
+        $paths = array_flip($routes);
         $cache = $this->grav['cache'];
-        $comments_cache_id = md5('comments-data' . $cache->getKey() . '-' . $uri->url());
-        $uri = $this->grav['uri'];
-        
-        //search in cache
-        if ($comments = $cache->fetch($comments_cache_id)) {
-            return $comments;
+        $options = array(
+            'comments_limit' => $limit,
+            'pages_limit' => $limit_pages,
+        );
+        //use cached stats if possible
+        $recent_comments_cache_id = md5('comments-stats' . $cache->getKey());
+        if ($recent_comments = $cache->fetch($recent_comments_cache_id)) {
+            //use cache only if limits are big enough
+            if($recent_comments['options']['comments_limit'] >= $options['comments_limit'] && $recent_comments['options']['pages_limit'] >= $options['pages_limit']) {
+                return $recent_comments;
+            }
         }
         
-        $comments = $this->getDataFromFilename($filename)['comments'];
-        $comments = $this->setCommentLevels($comments);
-        //save to cache if enabled
-        $cache->save($this->comments_cache_id, $comments);
- */
         $path = PAGES_DIR;
         $dirItr     = new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
         $itrFilter = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::SELF_FIRST);
@@ -570,8 +568,12 @@ class CommentsPlugin extends Plugin
         $comments = array();
         foreach ($filesItr as $filepath => $file) {
             if ($file->isDir()) {
-               // this should never trigger as we are looking vor yamls only
+                // this should never trigger as we are looking vor yamls only
             } else {
+                $route = '';
+                $fileFolder = substr($filepath, 0, strlen($filepath) - strlen($file->getFilename()) - 1);
+                if (!empty($paths[str_replace('/', '\\', $fileFolder)])) $route = $paths[str_replace('/', '\\', $fileFolder)];
+                if (!empty($paths[str_replace('\\', '/', $fileFolder)])) $route = $paths[str_replace('\\', '/', $fileFolder)];
                 $page_stats[$filepath] = array(
                     'active_entries' => 0,
                     'deleted_entries' => 0,
@@ -580,6 +582,7 @@ class CommentsPlugin extends Plugin
                     'active_replies' => 0,
                     'deleted_replies' => 0,
                     'latest_active_entry' => 0,
+                    'route' => $route,
                 );
                 $localfile = CompiledYamlFile::instance($filepath);
                 $localcomments = $localfile->content();
@@ -609,6 +612,7 @@ class CommentsPlugin extends Plugin
                             
                             $comments[] = array_merge(array(
                                 'path' => $filepath,
+                                'route' => $route,
                                 'time' => $time,
                             ), $comment);
                         }
@@ -619,16 +623,34 @@ class CommentsPlugin extends Plugin
                 }
             }
         }
-        usort($comments, function($a, $b) {
+        
+        //most recent comments first
+        usort($comments, function ($a, $b) {
             if ($a['time'] === $b['time']) return 0;
             if ($a['time'] < $b['time']) return 1;
             return -1;
         });
+        
+        //most recent pages first
+            usort($page_stats, function ($a, $b) {
+            if ($a['latest_active_entry'] === $b['latest_active_entry']) return 0;
+            if ($a['latest_active_entry'] < $b['latest_active_entry']) return 1;
+            return -1;
+        });
+
+        //reduce comments in output to limit
         if (!empty($limit) && $limit > 0 && $limit < count($comments)) {
-            return [$global_stats, $page_stats, array_slice($comments, 0, $limit)];
-        } else {
-            return [$global_stats, $page_stats, $comments];
+            $comments = array_slice($comments, 0, $limit);
         }
+        //reduce pages in output to limit
+        if (!empty($limit_pages) && $limit_pages > 0 && $limit_pages < count($page_stats)) {
+            $page_stats = array_slice($page_stats, 0, $limit_pages);
+        }
+        
+        //save to cache if enabled
+        $cache->save($recent_comments_cache_id, ['global_stats' => $global_stats, 'pages' => $page_stats, 'comments' => $comments, 'options' => $options]);
+        
+        return ['global_stats' => $global_stats, 'pages' => $page_stats, 'comments' => $comments, 'options' => $options];
     }
 
     private function getFilesOrderedByModifiedDate($path = '') {
@@ -723,7 +745,7 @@ class CommentsPlugin extends Plugin
     /**
      * Return the comments associated to the current route
      */
-    private function fetchComments() {
+    public function fetchComments() {
         $cache = $this->grav['cache'];
         //search in cache
         if ($comments = $cache->fetch($this->comments_cache_id)) {
@@ -899,6 +921,9 @@ class CommentsPlugin extends Plugin
         $obj = $event['object'];
         if ($obj instanceof Page) {
             //TODO $this->deleteComment($obj);
+            
+            //clear cache
+            $this->grav['cache']->delete(md5('comments-stats' . $this->grav['cache']->getKey()));
         }
         return true;
     }
