@@ -154,7 +154,7 @@ jQuery(document).ready(function () {
         if ($( "div[data-id='" + response.data.parent_id + "']" ).length > 0) {
 			$( "div[data-id='" + response.data.parent_id + "']" ).first().after(newMedia);
         } else {
-			$( "div.comments" ).last().prepend(newMedia);
+			$( "#comments" ).prepend(newMedia);
         }
       }
       setTimeout(function () {

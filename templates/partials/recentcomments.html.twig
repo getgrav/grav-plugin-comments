@@ -1,6 +1,6 @@
 {# you may set options when using this partial. Example: include 'partials/recentcomments.html.twig' with {'limit': 5, 'pages_limit': 3} #}
 {% if grav.twig.enable_comments_plugin %}
-        <h1>{'PLUGIN_COMMENTS.COMMENTS_STATS'|t}}</h1>
+        <h1>{{'PLUGIN_COMMENTS.COMMENTS_STATS'|t}}</h1>
 		{% set stats = recent_comments(limit|default(5), pages_limit|default(3)) %}
 		{% if stats.global_stats.active_entries %}
 			<i class="fa fa-comments" title="active_entries"></i> {{stats.global_stats.active_entries}}
@@ -13,7 +13,7 @@
 		{% endif %}
 		{% for key, entry in stats.pages %}
 			{% if loop.first %}
-		        <h2>{'PLUGIN_COMMENTS.RECENT_PAGES'|t}} (limit {{stats.options.pages_limit}})</h2>
+		        <h2>{{'PLUGIN_COMMENTS.RECENT_PAGES'|t}} (limit {{stats.options.pages_limit}})</h2>
 				<ul class="fa-ul">
 			{% endif %}
 			<li><i class="fa-li fa fa-file" title="{{entry.route}}"></i>
@@ -31,7 +31,7 @@
 		{% endfor %}
 		{% for key, entry in stats.comments %}
 			{% if loop.first %}
-		        <h2>{'PLUGIN_COMMENTS.RECENT_COMMENTS'|t}} (limit {{stats.options.comments_limit}})</h2>
+		        <h2>{{'PLUGIN_COMMENTS.RECENT_COMMENTS'|t}} (limit {{stats.options.comments_limit}})</h2>
 				<ul class="fa-ul">
 			{% endif %}
 			{% set entry_icon = 'fa-comment' %}

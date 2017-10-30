@@ -2,14 +2,12 @@
     {% set scope = scope ?: 'data.' %}
     <section id="comments-section">
         <h2>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
-    	<!-- <h2>{{ 'COMMENTS'|t }}</h2> -->
-
-    {% include 'partials/comments.form.html.twig' %}
-
-    {% if grav.twig.comments|length %}
-
 		<a class="comment-add-new" href="#"><i class="fa fa-plus" title="{{'PLUGIN_COMMENTS.ADD_NEW'|t}}"></i> {{'PLUGIN_COMMENTS.ADD_NEW'|t}}</a>
-            <div class="row comments">
+
+    	{% include 'partials/comments.form.html.twig' %}
+
+        <div id="comments" class="row comments">
+    	{% if grav.twig.comments|length %}
             {% for comment in grav.twig.comments %}
 				<div class="comment comment-level-{{comment.level|e}}" data-level="{{comment.level}}" data-id="{{comment.id}}" >
 				  <div class="comment-left">
@@ -33,10 +31,7 @@
 				  </div>
 				</div>
             {% endfor %}
-            </div>
-
-    {% endif %}
+    	{% endif %}
+        </div>
     </section>
 {% endif %}
-
-
