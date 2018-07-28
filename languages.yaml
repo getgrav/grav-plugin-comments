@@ -171,12 +171,21 @@ ru:
     COMMENTS: Комментарии
     EMAIL_NOT_CONFIGURED: Email не настроен
     NEW_COMMENT_EMAIL_SUBJECT: 'Новый комментарий к %1$s'
-    NEW_COMMENT_EMAIL_BODY: '<p>Новый комментарий был сделан на %1$s by %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
+    NEW_COMMENT_EMAIL_BODY: '<p>Новый комментарий на %1$s от %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
     EMAIL_FOOTER: ''
     NAME: Имя:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+    NAME_LABEL: "Имя"
+    NAME_PLACEHOLDER: "Введите свое имя"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Введите свой email адрес"
+    MESSAGE_LABEL: "Комментарий"
+    MESSAGE_PLACEHOLDER: "Введите свой комментарий"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Новый комментарий] от {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Благодарим за ваш комментарий!"
 
 pt-br:
   PLUGIN_COMMENTS:
