@@ -1,25 +1,3 @@
-de:
-  PLUGIN_COMMENTS:
-    ADD_COMMENT: Kommentar hinzufügen
-    COMMENTS: Kommentare
-    EMAIL_NOT_CONFIGURED: Email nicht konfiguriert
-    NEW_COMMENT_EMAIL_SUBJECT: 'Neuer Kommentar für %1$s'
-    NEW_COMMENT_EMAIL_BODY: '<p>Ein neuer Kommentar am %1$s von %3$s (%4$s).</p><p>Seite: %2$s</p><p>Text: %5$s</p>'
-    EMAIL_FOOTER: ''
-    NAME: Name:
-    EMAIL: Email:
-    WRITTEN_ON: geschrieben am
-    BY: von
-    NAME_LABEL: "Name"
-    NAME_PLACEHOLDER: "Namen eingeben"
-    EMAIL_LABEL: "Email"
-    EMAIL_PLACEHOLDER: "Email-Adresse eingeben"
-    MESSAGE_LABEL: "Kommentar"
-    MESSAGE_PLACEHOLDER: "Kommentar eingeben"
-    SUBMIT_COMMENT_BUTTON_TEXT: "Absenden"
-    EMAIL_NEW_COMMENT_SUBJECT: "[Neuer Kommentar] von {{ form.value.name|e }}"
-    THANK_YOU_MESSAGE: "Vielen Dank für den Kommentar!"
-
 en:
   PLUGIN_COMMENTS:
     ADD_COMMENT: Add a comment
@@ -41,6 +19,28 @@ en:
     SUBMIT_COMMENT_BUTTON_TEXT: "Submit"
     EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] from {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Thank you for writing your comment!"
+
+de:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Kommentar hinzufügen
+    COMMENTS: Kommentare
+    EMAIL_NOT_CONFIGURED: Email nicht konfiguriert
+    NEW_COMMENT_EMAIL_SUBJECT: 'Neuer Kommentar für %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Ein neuer Kommentar am %1$s von %3$s (%4$s).</p><p>Seite: %2$s</p><p>Text: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: Name:
+    EMAIL: Email:
+    WRITTEN_ON: geschrieben am
+    BY: von
+    NAME_LABEL: "Name"
+    NAME_PLACEHOLDER: "Namen eingeben"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Email-Adresse eingeben"
+    MESSAGE_LABEL: "Kommentar"
+    MESSAGE_PLACEHOLDER: "Kommentar eingeben"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Absenden"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Neuer Kommentar] von {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Vielen Dank für den Kommentar!"
 
 es:
   PLUGIN_COMMENTS:
@@ -151,6 +151,28 @@ ja:
     SUBMIT_COMMENT_BUTTON_TEXT: "送信する"
     EMAIL_NEW_COMMENT_SUBJECT: "[新しいコメント]、 {{ form.value.name|e }}から"
     THANK_YOU_MESSAGE: "コメントを書いてくださいましてありがとうございました！"
+
+nl:
+  PLUGIN_COMMENTS:
+    ADD_COMMENT: Reageer
+    COMMENTS: Reacties
+    EMAIL_NOT_CONFIGURED: Email niet geconfigureerd
+    NEW_COMMENT_EMAIL_SUBJECT: 'Nieuwe reactie op %1$s'
+    NEW_COMMENT_EMAIL_BODY: '<p>Er is een nieuwe reactie gemaakt op %1$s door %3$s (%4$s).</p><p>Pagina: %2$s</p><p>Tekst: %5$s</p>'
+    EMAIL_FOOTER: ''
+    NAME: 'Naam:'
+    EMAIL: 'Email:'
+    WRITTEN_ON: 'Geschreven op'
+    BY: 'door'
+    NAME_LABEL: "Naam"
+    NAME_PLACEHOLDER: "Vul je naam in"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Vul je emailadres in"
+    MESSAGE_LABEL: "Reactie"
+    MESSAGE_PLACEHOLDER: "Vul je reactie in"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Verstuur"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Nieuwe reactie] van {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Bedankt voor je reactie!"
 
 pl:
   PLUGIN_COMMENTS:
