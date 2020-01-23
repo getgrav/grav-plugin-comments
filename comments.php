@@ -347,7 +347,7 @@ class CommentsPlugin extends Plugin
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
 
-        $comments = $this->getDataFromFilename($filename)['comments'];
+        $comments = $this->getDataFromFilename($filename)['comments'] ?? [];
         //save to cache if enabled
         $cache->save($this->comments_cache_id, $comments);
         return $comments;
@@ -384,7 +384,7 @@ class CommentsPlugin extends Plugin
 
         if (!$fileInstance->content()) {
             //Item not found
-            return;
+            return [];
         }
 
         return Yaml::parse($fileInstance->content());
