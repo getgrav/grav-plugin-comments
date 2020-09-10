@@ -1,5 +1,5 @@
 # v1.2.8
-## mm/dd/2020
+## 09/10/2020
 
 1. [](#improved)
     * Improved some translations
