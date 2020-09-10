@@ -132,25 +132,25 @@ it:
 
 ja:
   PLUGIN_COMMENTS:
-    ADD_COMMENT: コメントを追加する
+    ADD_COMMENT: コメントする
     COMMENTS: コメント
-    EMAIL_NOT_CONFIGURED: メールアドレスは設定さていません
-    NEW_COMMENT_EMAIL_SUBJECT: '%1$sについて新しいコメント'
-    NEW_COMMENT_EMAIL_BODY: '<p>新しいコメントが%1$sについて%3$sから(%4$s)書かれた.</p><p>ページー : %2$s</p><p>文書 : %5$s</p>'
+    EMAIL_NOT_CONFIGURED: メールアドレスが設定さていません
+    NEW_COMMENT_EMAIL_SUBJECT: '%1$sの新しいコメント'
+    NEW_COMMENT_EMAIL_BODY: '<p>%1$sに新しいコメントが%3$sから(%4$s)に書かれました。</p><p>ページ : %2$s</p><p>内容 : %5$s</p>'
     EMAIL_FOOTER: ''
     NAME: 名前 :
     EMAIL: メールアドレス :
-    WRITTEN_ON: に書かれた
-    BY: に
+    WRITTEN_ON: 投稿日時
+    BY: By
     NAME_LABEL: "名前"
-    NAME_PLACEHOLDER: "お名前を"
-    EMAIL_LABEL: "メールアドレスを"
-    EMAIL_PLACEHOLDER: "ご自分のメールアドレスをここに..."
+    NAME_PLACEHOLDER: "名前を入力してください"
+    EMAIL_LABEL: "メールアドレス"
+    EMAIL_PLACEHOLDER: "メールアドレスを入力してください"
     MESSAGE_LABEL: "コメント"
-    MESSAGE_PLACEHOLDER: "コメントをここに"
-    SUBMIT_COMMENT_BUTTON_TEXT: "送信する"
-    EMAIL_NEW_COMMENT_SUBJECT: "[新しいコメント]、 {{ form.value.name|e }}から"
-    THANK_YOU_MESSAGE: "コメントを書いてくださいましてありがとうございました！"
+    MESSAGE_PLACEHOLDER: "コメントを入力してください"
+    SUBMIT_COMMENT_BUTTON_TEXT: "送信"
+    EMAIL_NEW_COMMENT_SUBJECT: "[新しいコメント] {{ form.value.name|e }}から"
+    THANK_YOU_MESSAGE: "コメントありがとうございます！"
 
 nl:
   PLUGIN_COMMENTS:
@@ -193,12 +193,21 @@ ru:
     COMMENTS: Комментарии
     EMAIL_NOT_CONFIGURED: Email не настроен
     NEW_COMMENT_EMAIL_SUBJECT: 'Новый комментарий к %1$s'
-    NEW_COMMENT_EMAIL_BODY: '<p>Новый комментарий был сделан на %1$s by %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
+    NEW_COMMENT_EMAIL_BODY: '<p>Новый комментарий на %1$s от %3$s (%4$s).</p><p>Страница: %2$s</p><p>Текст: %5$s</p>'
     EMAIL_FOOTER: ''
     NAME: Имя:
     EMAIL: Email:
     WRITTEN_ON: Написан в
     BY: от
+    NAME_LABEL: "Имя"
+    NAME_PLACEHOLDER: "Введите свое имя"
+    EMAIL_LABEL: "Email"
+    EMAIL_PLACEHOLDER: "Введите свой email адрес"
+    MESSAGE_LABEL: "Комментарий"
+    MESSAGE_PLACEHOLDER: "Введите свой комментарий"
+    SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
+    EMAIL_NEW_COMMENT_SUBJECT: "[Новый комментарий] от {{ form.value.name|e }}"
+    THANK_YOU_MESSAGE: "Благодарим за ваш комментарий!"
 
 pt-br:
   PLUGIN_COMMENTS:

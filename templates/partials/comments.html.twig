@@ -1,4 +1,4 @@
-{% if grav.twig.enable_comments_plugin %}
+{% if enable_comments_plugin %}
     {% set scope = scope ?: 'data.' %}
 
     <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
@@ -46,7 +46,7 @@
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
 
         <table>
-            {% for comment in grav.twig.comments|array_reverse %}
+            {% for comment in comments|array_reverse %}
             <tr>
                 <td>
                     {{comment.text}}

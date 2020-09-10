@@ -73,8 +73,17 @@ class CommentsPlugin extends Plugin
     }
 
     public function onTwigSiteVariables() {
-        $this->grav['twig']->enable_comments_plugin = $this->enable;
-        $this->grav['twig']->comments = $this->fetchComments();
+        // Old way
+        $enabled = $this->enable;
+        $comments = $this->fetchComments();
+
+        $this->grav['twig']->enable_comments_plugin = $enabled;
+        $this->grav['twig']->comments = $comments;
+
+        // New way
+        $this->grav['twig']->twig_vars['enable_comments_plugin'] = $enabled;
+        $this->grav['twig']->twig_vars['comments'] = $comments;
+
     }
 
     /**
@@ -189,8 +198,9 @@ class CommentsPlugin extends Plugin
             case 'addComment':
                 $post = isset($_POST['data']) ? $_POST['data'] : [];
 
+                $path = $this->grav['uri']->path();
+
                 $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
-                $path = filter_var(urldecode($post['path']), FILTER_SANITIZE_STRING);
                 $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
@@ -347,7 +357,8 @@ class CommentsPlugin extends Plugin
         $filename = $lang ? '/' . $lang : '';
         $filename .= $this->grav['uri']->path() . '.yaml';
 
-        $comments = $this->getDataFromFilename($filename)['comments'];
+        $data = $this->getDataFromFilename($filename);
+        $comments = isset($data['comments']) ? $data['comments'] : null;
         //save to cache if enabled
         $cache->save($this->comments_cache_id, $comments);
         return $comments;
