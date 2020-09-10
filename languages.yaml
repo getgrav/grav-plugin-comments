@@ -1,7 +1,16 @@
 de:
   PLUGIN_COMMENTS:
+    ADD_NEW: Kommentar hinzufügen
+    ADD_REPLY: Auf Kommentar antworten
     ADD_COMMENT: Kommentar hinzufügen
+    DELETE_COMMENT: Kommentar löschen
+    REPLY: Antworten
+    DELETE: Löschen
+    SUCCESS: "Der Kommentar wurde erfolgreich gespeichert."
     COMMENTS: Kommentare
+    COMMENTS_STATS: Kommentare
+    RECENT_COMMENTS: Neue Kommentare
+    RECENT_PAGES: Kommentierte Seiten
     EMAIL_NOT_CONFIGURED: Email nicht konfiguriert
     NEW_COMMENT_EMAIL_SUBJECT: 'Neuer Kommentar für %1$s'
     NEW_COMMENT_EMAIL_BODY: '<p>Ein neuer Kommentar am %1$s von %3$s (%4$s).</p><p>Seite: %2$s</p><p>Text: %5$s</p>'
@@ -22,8 +31,17 @@ de:
 
 en:
   PLUGIN_COMMENTS:
+    ADD_NEW: Add a comment
+    ADD_REPLY: Reply to comment
     ADD_COMMENT: Add a comment
+    DELETE_COMMENT: Delete comment
+    REPLY: Reply
+    DELETE: Delete
+    SUCCESS: "Comment has been saved successfully."
     COMMENTS: Comments
+    COMMENTS_STATS: Comments
+    RECENT_COMMENTS: Recent comments
+    RECENT_PAGES: Commented pages
     EMAIL_NOT_CONFIGURED: Email not configured
     NEW_COMMENT_EMAIL_SUBJECT: 'New comment on %1$s'
     NEW_COMMENT_EMAIL_BODY: '<p>A new comment was made on %1$s by %3$s (%4$s).</p><p>Page: %2$s</p><p>Text: %5$s</p>'

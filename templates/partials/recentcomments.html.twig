@@ -1,0 +1,54 @@
+{# you may set options when using this partial. Example: include 'partials/recentcomments.html.twig' with {'limit': 5, 'pages_limit': 3} #}
+{% if grav.twig.enable_comments_plugin %}
+        <h1>{{'PLUGIN_COMMENTS.COMMENTS_STATS'|t}}</h1>
+		{% set stats = recent_comments(limit|default(5), pages_limit|default(3)) %}
+		{% if stats.global_stats.active_entries %}
+			<i class="fa fa-comments" title="active_entries"></i> {{stats.global_stats.active_entries}}
+			 (<i class="fa fa-trash" title="deleted_entries"></i> {{stats.global_stats.deleted_entries}})
+			- <i class="fa fa-comment" title="active_comments"></i>{{stats.global_stats.active_comments}}
+			 (<i class="fa fa-trash" title="deleted_comments"></i> {{stats.global_stats.deleted_comments}})
+			- <i class="fa fa-commenting" title="active_replies"></i>{{stats.global_stats.active_replies}}
+			 (<i class="fa fa-trash" title="deleted_replies"></i> {{stats.global_stats.deleted_replies}})
+			- <i class="fa fa-files-o" title="pages_with_active_entries"></i> {{stats.global_stats.pages_with_active_entries}}
+		{% endif %}
+		{% for key, entry in stats.pages %}
+			{% if loop.first %}
+		        <h2>{{'PLUGIN_COMMENTS.RECENT_PAGES'|t}} (limit {{stats.options.pages_limit}})</h2>
+				<ul class="fa-ul">
+			{% endif %}
+			<li><i class="fa-li fa fa-file" title="{{entry.route}}"></i>
+			{% if entry.route %}
+				<a href="{{entry.route}}#comments">
+			{% endif %}
+			{{entry.active_entries}}
+			{% if entry.route %}
+				</a>
+			{% endif %}
+			</li>
+			{% if loop.last %}
+				</ul>
+			{% endif %}
+		{% endfor %}
+		{% for key, entry in stats.comments %}
+			{% if loop.first %}
+		        <h2>{{'PLUGIN_COMMENTS.RECENT_COMMENTS'|t}} (limit {{stats.options.comments_limit}})</h2>
+				<ul class="fa-ul">
+			{% endif %}
+			{% set entry_icon = 'fa-comment' %}
+			{% if not empty(entry.parent) %}
+			{% set entry_icon = 'fa-commenting' %}
+			{% endif %}
+			<li><i class="fa-li fa {{entry_icon}}" title="{{key}}: {{entry.id}}, {{entry.parent}}"></i>
+				{% if entry.route %}
+					<a href="{{entry.route}}#comments">
+				{% endif %}
+				{{entry.date}}, {{entry.author}}, {{entry.text|truncate(15)}}
+				{% if entry.route %}
+					</a>
+				{% endif %}
+			</li>
+			{% if loop.last %}
+				</ul>
+			{% endif %}
+		{% endfor %}
+{% endif %}
