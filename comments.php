@@ -358,7 +358,7 @@ class CommentsPlugin extends Plugin
         $filename .= $this->grav['uri']->path() . '.yaml';
 
         $data = $this->getDataFromFilename($filename);
-        $comments = $data['comments'] ?? null;
+        $comments = isset($data['comments']) ? $data['comments'] : null;
         //save to cache if enabled
         $cache->save($this->comments_cache_id, $comments);
         return $comments;
