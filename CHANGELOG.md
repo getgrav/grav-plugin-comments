@@ -1,6 +1,8 @@
 # v1.2.8
 ## mm/dd/2020
 
+1. [](#improved)
+    * Improved some translations
 1. [](#bugfix)
     * Fix for PHP 7.4 [#81](https://github.com/getgrav/grav-plugin-comments/issues/81)
     * Fix for allowing path in form submission [#86](https://github.com/getgrav/grav-plugin-comments/issues/86) [#80](https://github.com/getgrav/grav-plugin-comments/issues/80)
