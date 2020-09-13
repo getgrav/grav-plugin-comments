@@ -71,4 +71,3 @@ The plugin interacts with the Email plugin to send emails upon receiving a comme
 - Allow to delete comments from the Admin Plugin
 - Ability to see all comments of a page in the Admin Plugin
 - Ability to reply to a comment from the Admin Plugin
-- Auto-fill the comment form when a user is logged in
