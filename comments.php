@@ -199,12 +199,11 @@ class CommentsPlugin extends Plugin
                 $post = isset($_POST['data']) ? $_POST['data'] : [];
 
                 $path = $this->grav['uri']->path();
+                $title = $this->grav['page']->title();
 
-                $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
                 $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
 
                 if (isset($this->grav['user'])) {
                     $user = $this->grav['user'];
