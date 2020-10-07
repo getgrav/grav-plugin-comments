@@ -83,7 +83,6 @@ class CommentsPlugin extends Plugin
         // New way
         $this->grav['twig']->twig_vars['enable_comments_plugin'] = $enabled;
         $this->grav['twig']->twig_vars['comments'] = $comments;
-
     }
 
     /**
@@ -95,6 +94,11 @@ class CommentsPlugin extends Plugin
         $disable_on_routes = (array) $this->config->get('plugins.comments.disable_on_routes');
         $enable_on_routes = (array) $this->config->get('plugins.comments.enable_on_routes');
 
+        $re_disable_on_routes = (array) $this->config->get('plugins.comments.disable_on_routes_regex');
+        $re_enable_on_routes = (array) $this->config->get('plugins.comments.enable_on_routes_regex');
+
+        $also_route_aliases = (array) $this->config->get('plugins.comments.check_route_aliases');
+
         $path = $uri->path();
 
         if (!in_array($path, $disable_on_routes)) {
@@ -104,11 +108,44 @@ class CommentsPlugin extends Plugin
                 foreach($enable_on_routes as $route) {
                     if (Utils::startsWith($path, $route)) {
                         $this->enable = true;
-                        break;
+                        return true;
                     }
                 }
             }
         }
+    
+        //loop through including regex' first – then through excluding  
+        $re_match = false;
+        foreach ($re_enable_on_routes as $re):
+            try {
+                $pattern = $re;
+                //if no delimiters are present, add them
+                if (!preg_match("/^\/.+\/[a-z]*$/i",$pattern)) $pattern = "!".$re."!su";
+                if (preg_match($pattern, $path)):
+                    $re_match = true;
+                    break;
+                endif;
+            } catch(\Exception $e) {
+                $this->grav['debugger']->addMessage($e);
+                continue;
+            }
+        endforeach;
+        foreach ($re_disable_on_routes as $re):
+            try {
+                $pattern = $re;
+                //if no delimiters are present, add them
+                if (!preg_match("/^\/.+\/[a-z]*$/i",$pattern)) $pattern = "!".$re."!su";
+                if (preg_match($pattern, $path)):
+                    $re_match = false;
+                    break;
+                endif;
+            } catch(\Exception $e) {
+                $this->grav['debugger']->addMessage($e);
+                continue;
+            }
+        endforeach;
+        
+        $this->enable = $re_match;
     }
 
     /**
