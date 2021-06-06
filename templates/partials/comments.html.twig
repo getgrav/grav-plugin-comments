@@ -39,7 +39,7 @@
         {{ nonce_field('form', 'form-nonce')|raw }}
     </form>
 
-    <div class="alert">{{ form.message }}</div>
+    <div class="alert">{{ form.message | raw }}</div>
 
     {% if grav.twig.comments|length %}
 
