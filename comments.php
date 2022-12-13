@@ -217,8 +217,9 @@ class CommentsPlugin extends Plugin
                 /** @var Language $language */
                 $language = $this->grav['language'];
                 $lang = $language->getLanguage();
-
-                $filename = DATA_DIR . 'comments';
+                
+                $data_dir = $this->grav['locator']->findResource('user-data://');
+                $filename = $data_dir . DS . 'comments';
                 $filename .= ($lang ? '/' . $lang : '');
                 $filename .= $path . '.yaml';
                 $file = File::instance($filename);
@@ -258,7 +259,8 @@ class CommentsPlugin extends Plugin
         $files = [];
 
         if (!$path) {
-            $path = DATA_DIR . 'comments';
+            $data_dir = $this->grav['locator']->findResource('user-data://');
+            $path = $data_dir . DS . 'comments';
         }
 
         if (!file_exists($path)) {
@@ -391,7 +393,8 @@ class CommentsPlugin extends Plugin
     private function getDataFromFilename($fileRoute) {
 
         //Single item details
-        $fileInstance = File::instance(DATA_DIR . 'comments/' . $fileRoute);
+        $data_dir = $this->grav['locator']->findResource('user-data://');
+        $fileInstance = File::instance($data_dir . DS . 'comments/' . $fileRoute);
 
         if (!$fileInstance->content()) {
             //Item not found
