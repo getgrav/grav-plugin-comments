@@ -10,12 +10,14 @@ disable_on_routes:
 
 form:
     name: comments
+    classes: ''
     fields:
         - name: name
           label: PLUGIN_COMMENTS.NAME_LABEL
           placeholder: PLUGIN_COMMENTS.NAME_PLACEHOLDER
           autocomplete: on
           type: text
+          outerclasses: ''
           validate:
             required: true
 
@@ -23,6 +25,7 @@ form:
           label: PLUGIN_COMMENTS.EMAIL_LABEL
           placeholder: PLUGIN_COMMENTS.EMAIL_PLACEHOLDER
           type: email
+          outerclasses: ''
           validate:
             required: true
 
@@ -30,6 +33,7 @@ form:
           label: PLUGIN_COMMENTS.MESSAGE_LABEL
           placeholder: PLUGIN_COMMENTS.MESSAGE_PLACEHOLDER
           type: textarea
+          outerclasses: ''
           validate:
             required: true
 
@@ -63,6 +67,9 @@ form:
     buttons:
         - type: submit
           value: PLUGIN_COMMENTS.SUBMIT_COMMENT_BUTTON_TEXT
+        -
+          type: reset
+          value: PLUGIN_COMMENTS.RESET_COMMENT_BUTTON_TEXT
 
     process:
 #        - captcha:
