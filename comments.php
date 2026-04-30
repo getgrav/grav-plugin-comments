@@ -152,7 +152,7 @@ class CommentsPlugin extends Plugin
             'onDataTypeExcludeFromDataManagerPluginHook' => ['onDataTypeExcludeFromDataManagerPluginHook', 0],
         ]);
 
-        if (strpos($uri->path(), $this->config->get('plugins.admin.route') . '/' . $this->route) === false) {
+        if (strpos((string) $uri->path(), $this->config->get('plugins.admin.route') . '/' . $this->route) === false) {
             return;
         }
 
@@ -200,11 +200,11 @@ class CommentsPlugin extends Plugin
 
                 $path = $this->grav['uri']->path();
 
-                $lang = filter_var(urldecode($post['lang']), FILTER_SANITIZE_STRING);
-                $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
-                $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
-                $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                $title = filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING);
+                $lang = filter_var(urldecode((string) $post['lang']), FILTER_SANITIZE_STRING);
+                $text = filter_var(urldecode((string) $post['text']), FILTER_SANITIZE_STRING);
+                $name = filter_var(urldecode((string) $post['name']), FILTER_SANITIZE_STRING);
+                $email = filter_var(urldecode((string) $post['email']), FILTER_SANITIZE_STRING);
+                $title = filter_var(urldecode((string) $post['title']), FILTER_SANITIZE_STRING);
 
                 if (isset($this->grav['user'])) {
                     $user = $this->grav['user'];

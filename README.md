@@ -1,5 +1,13 @@
 # Grav Comments Plugin
 
+> [!warning]
+> This plugin is no longer developed or supported and has been deprecated.
+> 
+> A new much more powerful premium plugin called "**Comments Pro**" has been releaed to replace it.
+> It supports automatic spam detection, moderation, state management, collapsible nested views, Grav login + gueset access, markdown editing, avatars, live updates, and many more features.
+> 
+> https://getgrav.org/premium/comments-pro
+
 The **Comments Plugin** for [Grav](http://github.com/getgrav/grav) adds the ability to add comments to pages, and moderate them.
 
 # Installation

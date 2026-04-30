@@ -1,7 +1,7 @@
 name: Comments
 type: plugin
 slug: comments
-version: 1.2.8
+version: 1.2.9
 description: Adds a commenting functionality to your site
 icon: comment
 author:
@@ -13,6 +13,9 @@ keywords: guestbook, plugin
 bugs: https://github.com/getgrav/grav-plugin-comments/issues
 readme: https://github.com/getgrav/grav-plugin-comments/blob/develop/README.md
 license: MIT
+
+compatibility:
+  grav: ['1.7', '2.0']
 
 dependencies:
   - form
