@@ -4,7 +4,7 @@
     <h3>{{'PLUGIN_COMMENTS.ADD_COMMENT'|t}}</h3>
 
     <form name="{{ grav.config.plugins.comments.form.name }}"
-          action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}"
+          action="{{ grav.config.plugins.comments.form.action ?  base_url ~ grav.config.plugins.comments.form.action : page.url }}#comments-section"
           method="{{ grav.config.plugins.comments.form.method|upper|default('POST') }}">
 
         {% for field in grav.config.plugins.comments.form.fields %}
@@ -39,22 +39,25 @@
         {{ nonce_field('form', 'form-nonce')|raw }}
     </form>
 
-    <div class="alert">{{ form.message }}</div>
+    <div id="comments-section" class="{{ grav.config.plugins.comments.classes.wrapper|default('') }}">
+        <div class="{{ grav.config.plugins.comments.classes.alert|default('alert') }}">{{ form.message }}</div>
 
-    {% if grav.twig.comments|length %}
+        {% if grav.twig.comments|length %}
 
-        <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
+            <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
 
-        <table>
-            {% for comment in comments|array_reverse %}
-            <tr>
-                <td>
-                    {{comment.text}}
-                    <br />
-                    {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+            <table class="{{ grav.config.plugins.comments.classes.table|default('') }}">
+                {% for comment in comments|array_reverse %}
+                <tr class="{{ grav.config.plugins.comments.classes.rows|default('') }}">
+                    <td class="{{ grav.config.plugins.comments.classes.cols|default('') }}">
+                        <p>{{comment.text}}</p>
+                        <p class="{{ grav.config.plugins.comments.classes.meta|default('') }}">
+                        {{'PLUGIN_COMMENTS.WRITTEN_ON'|t}} {{comment.date|e}} {{'PLUGIN_COMMENTS.BY'|t}} {{comment.author}}
+                        </p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
 {% endif %}
