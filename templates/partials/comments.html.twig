@@ -46,7 +46,7 @@
         <h3>{{'PLUGIN_COMMENTS.COMMENTS'|t}}</h3>
 
         <table>
-            {% for comment in comments|array_reverse %}
+            {% for comment in comments|reverse %}
             <tr>
                 <td>
                     {{comment.text}}
