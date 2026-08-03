@@ -1,3 +1,9 @@
+# v1.2.10
+## 08/03/2026
+
+1. [](#bugfix)
+    * The comments list no longer breaks on Grav 2.0, which dropped the Twig shortcut the template used to show newest comments first.
+
 # v1.2.9
 ## 04/30/2026
 
