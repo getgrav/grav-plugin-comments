@@ -1,7 +1,7 @@
 name: Comments
 type: plugin
 slug: comments
-version: 1.2.9
+version: 1.2.10
 description: Adds a commenting functionality to your site
 icon: comment
 author:
