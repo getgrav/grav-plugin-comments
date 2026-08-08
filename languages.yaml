@@ -17,6 +17,7 @@ en:
     MESSAGE_LABEL: "Comment"
     MESSAGE_PLACEHOLDER: "Enter your comment"
     SUBMIT_COMMENT_BUTTON_TEXT: "Submit"
+    RESET_COMMENT_BUTTON_TEXT: "Reset"
     EMAIL_NEW_COMMENT_SUBJECT: "[New Comment] from {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Thank you for writing your comment!"
 
@@ -39,6 +40,7 @@ de:
     MESSAGE_LABEL: "Kommentar"
     MESSAGE_PLACEHOLDER: "Kommentar eingeben"
     SUBMIT_COMMENT_BUTTON_TEXT: "Absenden"
+    RESET_COMMENT_BUTTON_TEXT: "Zurücksetzen"
     EMAIL_NEW_COMMENT_SUBJECT: "[Neuer Kommentar] von {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Vielen Dank für den Kommentar!"
 
@@ -61,6 +63,7 @@ es:
     MESSAGE_LABEL: "Comentario"
     MESSAGE_PLACEHOLDER: "Escriba su comentario"
     SUBMIT_COMMENT_BUTTON_TEXT: "Enviar"
+    RESET_COMMENT_BUTTON_TEXT: "Restablecer"
     EMAIL_NEW_COMMENT_SUBJECT: "[Nuevo comentario] de {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Gracias por escribir su comentario!"
 
@@ -83,6 +86,7 @@ fr:
     MESSAGE_LABEL: "Commentaire"
     MESSAGE_PLACEHOLDER: "Rédigez votre commentaire"
     SUBMIT_COMMENT_BUTTON_TEXT: "Envoyer"
+    RESET_COMMENT_BUTTON_TEXT: "Réinitialiser"
     EMAIL_NEW_COMMENT_SUBJECT: "[Nouveau commentaire] de {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Merci d'avoir rédigé votre commentaire !"
 
@@ -105,6 +109,7 @@ hr:
     MESSAGE_LABEL: "Komentar"
     MESSAGE_PLACEHOLDER: "Unesite komentar"
     SUBMIT_COMMENT_BUTTON_TEXT: "Pošalji"
+    RESET_COMMENT_BUTTON_TEXT: "Ponastaviti"
     EMAIL_NEW_COMMENT_SUBJECT: "[Novi komentar] od {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Hvala Vam što ste napisali svoj komentar!"
 
@@ -127,6 +132,7 @@ it:
     MESSAGE_LABEL: "Messaggio"
     MESSAGE_PLACEHOLDER: "Inserisci il tuo commento"
     SUBMIT_COMMENT_BUTTON_TEXT: "Invia"
+    RESET_COMMENT_BUTTON_TEXT: "Ripristina"
     EMAIL_NEW_COMMENT_SUBJECT: "[Nuovo commento] da {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Grazie per il tuo commento!"
 
@@ -149,6 +155,7 @@ ja:
     MESSAGE_LABEL: "コメント"
     MESSAGE_PLACEHOLDER: "コメントを入力してください"
     SUBMIT_COMMENT_BUTTON_TEXT: "送信"
+    RESET_COMMENT_BUTTON_TEXT: "リセット"
     EMAIL_NEW_COMMENT_SUBJECT: "[新しいコメント] {{ form.value.name|e }}から"
     THANK_YOU_MESSAGE: "コメントありがとうございます！"
 
@@ -171,6 +178,7 @@ nl:
     MESSAGE_LABEL: "Reactie"
     MESSAGE_PLACEHOLDER: "Vul je reactie in"
     SUBMIT_COMMENT_BUTTON_TEXT: "Verstuur"
+    RESET_COMMENT_BUTTON_TEXT: "Opnieuw instellen"
     EMAIL_NEW_COMMENT_SUBJECT: "[Nieuwe reactie] van {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Bedankt voor je reactie!"
 
@@ -206,6 +214,7 @@ ru:
     MESSAGE_LABEL: "Комментарий"
     MESSAGE_PLACEHOLDER: "Введите свой комментарий"
     SUBMIT_COMMENT_BUTTON_TEXT: "Отправить"
+    RESET_COMMENT_BUTTON_TEXT: "Перезагрузить"
     EMAIL_NEW_COMMENT_SUBJECT: "[Новый комментарий] от {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Благодарим за ваш комментарий!"
 
@@ -228,6 +237,7 @@ pt-br:
     MESSAGE_LABEL: "Comentário"
     MESSAGE_PLACEHOLDER: "Escreva seu comentário"
     SUBMIT_COMMENT_BUTTON_TEXT: "Enviar"
+    RESET_COMMENT_BUTTON_TEXT: "Reiniciar"
     EMAIL_NEW_COMMENT_SUBJECT: "[Novo comentário] de {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Obrigada por enviar seu comentário!"
 
@@ -250,6 +260,7 @@ ro:
     MESSAGE_LABEL: "Comentariu"
     MESSAGE_PLACEHOLDER: "Scrieți comentariul Dvs."
     SUBMIT_COMMENT_BUTTON_TEXT: "Trimiteți"
+    RESET_COMMENT_BUTTON_TEXT: "Resetați"
     EMAIL_NEW_COMMENT_SUBJECT: "[Comentariu nou] from {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Vă mulțumim pentru comentariu!"
 
@@ -272,5 +283,6 @@ no:
     MESSAGE_LABEL: "Kommentar"
     MESSAGE_PLACEHOLDER: "Skriv din kommentar"
     SUBMIT_COMMENT_BUTTON_TEXT: "Send"
+    RESET_COMMENT_BUTTON_TEXT: "Nullstille"
     EMAIL_NEW_COMMENT_SUBJECT: "[Ny kommentar] fra {{ form.value.name|e }}"
     THANK_YOU_MESSAGE: "Takk for din kommentar!"
