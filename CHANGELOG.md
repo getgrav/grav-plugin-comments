@@ -1,3 +1,9 @@
+# v1.2.11
+## 09/09/2026
+
+1. [](#improved)
+    * **Comment data in the admin is no longer readable by people who are not logged in.** The handler returned its data before the admin login screen had a chance to load, exposing commenter email addresses and server file paths to anyone who asked for the right URL. It now requires a logged-in administrator, and no longer includes the file path at all. Thanks to @AlpetGexha
+
 # v1.2.10
 ## 08/03/2026
 
