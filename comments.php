@@ -156,6 +156,19 @@ class CommentsPlugin extends Plugin
             return;
         }
 
+        // Require an authenticated, authorized admin before exposing any comment
+        // data. isAdmin() only reports that the admin *service* is registered on this
+        // route, never that the visitor is logged in, and the echo/exit() below runs
+        // during onPluginsInitialized -- before the admin plugin reaches the pages
+        // stage where it would render its login screen. Without this gate the exit()
+        // pre-empted login enforcement entirely and any anonymous visitor could read
+        // commenter email addresses. (GHSA-3cq9-f4pf-hq59)
+        $user = $this->grav['user'] ?? null;
+        if (!$user || !$user->authenticated
+            || !($user->authorize('admin.comments') || $user->authorize('admin.super'))) {
+            return;
+        }
+
         $page = $this->grav['uri']->param('page');
         $comments = $this->getLastComments($page);
 
@@ -318,7 +331,9 @@ class CommentsPlugin extends Plugin
                 $commentTimestamp = \DateTime::createFromFormat('D, d M Y H:i:s', $data['comments'][$i]['date'])->getTimestamp();
 
                 $data['comments'][$i]['pageTitle'] = $data['title'];
-                $data['comments'][$i]['filePath'] = $file->filePath;
+                // The absolute server path is never rendered by any template and only
+                // ever leaked server layout to whoever read the response.
+                // (GHSA-3cq9-f4pf-hq59)
                 $data['comments'][$i]['timestamp'] = $commentTimestamp;
             }
             if (count($data['comments'])) {
